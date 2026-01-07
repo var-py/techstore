@@ -1,0 +1,6 @@
+psycopg2-binary
+python-dotenv
+sqlalchemy
+flask
+passlib
+argon2-cffi

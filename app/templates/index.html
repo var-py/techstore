@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechShop - Интернет-магазин электроники</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+<!-- Header -->
+<!-- Header -->
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-laptop"></i>
+                <span>TechShop</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#"><i class="fas fa-home"></i> Главная</a></li>
+                    <li><a href="#catalog"><i class="fas fa-list"></i> Каталог</a></li>
+                    <li><a href="#support"><i class="fas fa-headset"></i> Поддержка</a></li>
+                </ul>
+            </nav>
+
+            <!-- Поисковая строка -->
+            <div class="search-container">
+                <form action="/search" method="GET" class="search-form">
+                    <input type="text" name="q" placeholder="Поиск товаров..." class="search-input">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-login"><i class="fas fa-user"></i> Войти</a>
+                <a href="#" class="btn btn-register">Регистрация</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Техника будущего уже сегодня</h1>
+        <p>Широкий выбор электроники по доступным ценам с гарантией качества</p>
+        <a href="#catalog" class="btn btn-primary"><i class="fas fa-shopping-cart"></i> Перейти к покупкам</a>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories" id="catalog">
+    <div class="container">
+        <h2 class="section-title">Категории товаров</h2>
+        <div class="categories-grid">
+            {% for category in s %}
+            <div class="category-card">
+                <div class="category-img">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="category-content">
+                    <h3>{{category[0]}}</h3>
+                    {% if category[1] > 1 %}
+                    <p>Более 1 шт.</p>
+                    {% else %}
+                    <p>{{category[1]}} шт.</p>
+                    {% endif %}
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Products Section -->
+<section class="products">
+    <div class="container">
+        <h2 class="section-title">Популярные товары</h2>
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card" onclick="window.location.href='/product/{{product.id}}'">
+                <div class="product-img">
+                    <img src="{{product.photo}}" alt="Смартфон">
+                </div>
+                <div class="product-content">
+                    <h3>{{product.title}}</h3>
+                    <p>{{product.description}}</p>
+                    <div class="product-price">{{product.price}} ₽</div>
+                    <button class="btn-add-to-cart">В корзину</button>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<!-- Support Section -->
+<section class="support" id="support">
+    <div class="container">
+        <h2 class="section-title">Поддержка</h2>
+        <div class="support-options">
+            <div class="support-card">
+                <i class="fas fa-question-circle"></i>
+                <h3>Частые вопросы</h3>
+                <p>Ответы на популярные вопросы о товарах, доставке и оплате</p>
+            </div>
+            <div class="support-card">
+                <i class="fas fa-phone-alt"></i>
+                <h3>Телефон поддержки</h3>
+                <p>8-800-123-45-67<br>Бесплатно по России</p>
+            </div>
+            <div class="support-card">
+                <i class="fas fa-envelope"></i>
+                <h3>Электронная почта</h3>
+                <p>support@techshop.ru<br>Ответ в течение 24 часов</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chat Bot -->
+<div class="chat-bot">
+    <div class="chat-btn" id="chatBtn">
+        <i class="fas fa-comments"></i>
+    </div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <h3>Чат с поддержкой</h3>
+            <span id="closeChat"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                Здравствуйте! Чем могу помочь?
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Введите ваше сообщение...">
+            <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>О магазине</h3>
+                <ul>
+                    <li><a href="#">О нас</a></li>
+                    <li><a href="#">Наши магазины</a></li>
+                    <li><a href="#">Вакансии</a></li>
+                    <li><a href="#">Новости</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Помощь</h3>
+                <ul>
+                    <li><a href="#">Как сделать заказ</a></li>
+                    <li><a href="#">Доставка</a></li>
+                    <li><a href="#">Оплата</a></li>
+                    <li><a href="#">Гарантия</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Контакты</h3>
+                <ul>
+                    <li><a href="#">Телефон: 8-800-123-45-67</a></li>
+                    <li><a href="#">Email: info@techshop.ru</a></li>
+                    <li><a href="#">Адрес: Москва, ул. Примерная, 15</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Мы в соцсетях</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-vk"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2023 TechShop - Интернет-магазин электроники. Все права защищены.
+        </div>
+    </div>
+</footer>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Интернет-магазин</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">МАГАЗИН</div>
+            <div class="user-info">
+                <div class="user-avatar">ИИ</div>
+                <div>{{name}}</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#profile" class="active" data-section="profile">Личные данные</a></li>
+                <li><a href="#orders" data-section="orders">Мои заказы</a></li>
+                <li><a href="#addresses" data-section="addresses">Адреса доставки</a></li>
+                <li><a href="#favorites" data-section="favorites">Избранное</a></li>
+                <li><a href="#reviews" data-section="reviews">Мои отзывы</a></li>
+                <li><a href="#settings" data-section="settings">Настройки</a></li>
+                <li><a href="/logout">Выйти</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- Секция личных данных -->
+            <section id="profile-section" class="content-section active">
+                <h2 class="section-title">Личные данные</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="name">Имя</label>
+                        <input type="text" id="name" value="{{name}}">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" value="{{email}}">
+                    </div>
+                    <button type="button" class="btn">Сохранить изменения</button>
+                </form>
+            </section>
+
+            <!-- Секция заказов -->
+            <section id="orders-section" class="content-section">
+                <h2 class="section-title">История заказов</h2>
+
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>Заказ №12345 от 12.05.2023</div>
+                        <div class="order-status status-delivered">Доставлен</div>
+                    </div>
+                    <div class="order-details">
+                        <div>3 товара на сумму 15 490 руб.</div>
+                        <div>Курьерская доставка</div>
+                    </div>
+                </div>
+
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>Заказ №12344 от 05.05.2023</div>
+                        <div class="order-status status-processing">В обработке</div>
+                    </div>
+                    <div class="order-details">
+                        <div>2 товара на сумму 8 750 руб.</div>
+                        <div>Самовывоз</div>
+                    </div>
+                </div>
+
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>Заказ №12340 от 20.04.2023</div>
+                        <div class="order-status status-cancelled">Отменен</div>
+                    </div>
+                    <div class="order-details">
+                        <div>1 товар на сумму 4 990 руб.</div>
+                        <div>Почтовая доставка</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Секция адресов доставки -->
+            <section id="addresses-section" class="content-section">
+                <h2 class="section-title">Адреса доставки</h2>
+                <p>Здесь вы можете управлять своими адресами доставки.</p>
+                <!-- Контент для адресов доставки -->
+            </section>
+
+            <!-- Секция избранного -->
+            <section id="favorites-section" class="content-section">
+                <h2 class="section-title">Избранные товары</h2>
+                <p>Здесь будут отображаться товары, добавленные в избранное.</p>
+                <!-- Контент для избранного -->
+            </section>
+
+            <!-- Секция отзывов -->
+            <section id="reviews-section" class="content-section">
+                <h2 class="section-title">Мои отзывы</h2>
+                <p>Здесь будут отображаться ваши отзывы о товарах.</p>
+                <!-- Контент для отзывов -->
+            </section>
+
+            <!-- Секция настроек -->
+            <section id="settings-section" class="content-section">
+                <h2 class="section-title">Настройки аккаунта</h2>
+                <p>Здесь вы можете настроить параметры вашего аккаунта.</p>
+                <!-- Контент для настроек -->
+            </section>
+        </main>
+    </div>
+<script src="{{ url_for('static', filename='js/account.js') }}"></script>
+</body>
+</html>

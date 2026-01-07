@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Восстановление пароля | TechShop</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forgotpass.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-laptop"></i>
+                    <span>TechShop</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
+                        <li><a href="catalog.html"><i class="fas fa-list"></i> Каталог</a></li>
+                        <li><a href="support.html"><i class="fas fa-headset"></i> Поддержка</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="login.html" class="btn btn-login"><i class="fas fa-user"></i> Войти</a>
+                    <a href="register.html" class="btn btn-register">Регистрация</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="password-recovery-main">
+        <div class="container">
+            <div class="recovery-container">
+                <div class="recovery-card">
+                    <div class="recovery-header">
+                        <div class="recovery-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h1>Восстановление пароля</h1>
+                        <p>Введите email вашего аккаунта, и мы вышлем вам инструкции для сброса пароля</p>
+                    </div>
+
+                    <form class="recovery-form" id="recoveryForm">
+                        <div class="form-group">
+                            <label for="email" id="email-label">Email адрес</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                            </div>
+                            <div class="error-message" id="emailError"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-recovery" id="recoveryBtn">
+                            <i class="fas fa-paper-plane"></i> Отправить код
+                        </button>
+
+                        <div class="recovery-links">
+                            <a href="login.html" class="back-to-login">
+                                <i class="fas fa-arrow-left"></i> Вернуться к входу
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="recovery-steps">
+                        <h3>Как это работает:</h3>
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>Введите ваш email</h4>
+                                    <p>Укажите email, который вы использовали при регистрации</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>Проверьте почту</h4>
+                                    <p>Мы отправим вам письмо со ссылкой для сброса пароля</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>Создайте новый пароль</h4>
+                                    <p>Перейдите по ссылке и установите новый пароль для аккаунта</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recovery-info">
+                    <div class="info-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Безопасность</h3>
+                        <p>Все операции защищены SSL-шифрованием. Ваши данные в безопасности</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>Быстро</h3>
+                        <p>Письмо приходит в течение 2-5 минут. Проверьте папку "Спам", если не видите письмо</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-headset"></i>
+                        <h3>Помощь</h3>
+                        <p>Если у вас возникли проблемы, обратитесь в нашу службу поддержки</p>
+                        <a href="support.html" class="support-link">Связаться с поддержкой</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Письмо отправлено!</h2>
+            <p>Мы отправили инструкции для сброса пароля на email: <strong id="userEmail"></strong></p>
+            <p class="modal-note">Если вы не получили письмо в течение 5 минут, проверьте папку "Спам" или повторите попытку.</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="closeModal">Понятно</button>
+                <button class="btn btn-outline" id="resendEmail">Отправить еще раз</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>О магазине</h3>
+                    <ul>
+                        <li><a href="#">О компании</a></li>
+                        <li><a href="#">Вакансии</a></li>
+                        <li><a href="#">Контакты</a></li>
+                        <li><a href="#">Новости</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Помощь</h3>
+                    <ul>
+                        <li><a href="#">Как сделать заказ</a></li>
+                        <li><a href="#">Доставка</a></li>
+                        <li><a href="#">Оплата</a></li>
+                        <li><a href="#">Гарантия</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Сервисы</h3>
+                    <ul>
+                        <li><a href="#">Бонусная программа</a></li>
+                        <li><a href="#">Кредит и рассрочка</a></li>
+                        <li><a href="#">Trade-In</a></li>
+                        <li><a href="#">Сервисные центры</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Контакты</h3>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> 8 (800) 123-45-67</li>
+                        <li><i class="fas fa-envelope"></i> info@techshop.ru</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Москва, ул. Примерная, 15</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="copyright">
+                &copy; 2023 TechShop. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/forgotpass.js') }}"></script>
+</body>
+</html>

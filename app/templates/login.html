@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в личный кабинет | TechShop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-laptop"></i>
+                    <span>TechShop</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
+                        <li><a href="catalog.html"><i class="fas fa-list"></i> Каталог</a></li>
+                        <li><a href="support.html"><i class="fas fa-headset"></i> Поддержка</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="register.html" class="btn btn-register">Регистрация</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="login-main">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <h1><i class="fas fa-sign-in-alt"></i> Вход в аккаунт</h1>
+                        <p>Войдите в свой аккаунт для доступа к персональным скидкам и истории заказов</p>
+                    </div>
+ <div class="success-message" id="successMessage">
+            вход прошел успешно!
+        </div>
+                    <form class="login-form" id="loginForm">
+                        <div class="form-group">
+                            <label for="email">Email адрес</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                            </div>
+                            <div class="error-message" id="emailError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Пароль</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="password" name="password" placeholder="Введите ваш пароль" required>
+                                <button type="button" class="toggle-password" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="error-message" id="passwordError"></div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="rememberMe">
+                                <span class="checkmark"></span>
+                                Запомнить меня
+                            </label>
+                            <a href="/forgot/password" class="forgot-password">Забыли пароль?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-login" id="loginBtn">
+                            <i class="fas fa-sign-in-alt"></i> Войти
+                        </button>
+
+                        <div class="social-login">
+                            <div class="divider">
+                                <span>или войдите через</span>
+                            </div>
+                            <div class="social-buttons">
+                                <button type="button" class="btn btn-social btn-google">
+                                    <i class="fab fa-google"></i> Google
+                                </button>
+                                <button type="button" class="btn btn-social btn-vk">
+                                    <i class="fab fa-vk"></i> VK
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="register-link">
+                            Еще нет аккаунта? <a href="register.html">Зарегистрироваться</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="login-features">
+                    <div class="feature-card">
+                        <i class="fas fa-shopping-bag"></i>
+                        <h3>История заказов</h3>
+                        <p>Просматривайте всю историю ваших покупок и отслеживайте текущие заказы</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-heart"></i>
+                        <h3>Избранное</h3>
+                        <p>Сохраняйте понравившиеся товары и получайте уведомления об акциях</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-percentage"></i>
+                        <h3>Персональные скидки</h3>
+                        <p>Получайте специальные предложения и накапливайте бонусы</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>О магазине</h3>
+                    <ul>
+                        <li><a href="#">О компании</a></li>
+                        <li><a href="#">Вакансии</a></li>
+                        <li><a href="#">Контакты</a></li>
+                        <li><a href="#">Новости</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Помощь</h3>
+                    <ul>
+                        <li><a href="#">Как сделать заказ</a></li>
+                        <li><a href="#">Доставка</a></li>
+                        <li><a href="#">Оплата</a></li>
+                        <li><a href="#">Гарантия</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Сервисы</h3>
+                    <ul>
+                        <li><a href="#">Бонусная программа</a></li>
+                        <li><a href="#">Кредит и рассрочка</a></li>
+                        <li><a href="#">Trade-In</a></li>
+                        <li><a href="#">Сервисные центры</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Контакты</h3>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> 8 (800) 123-45-67</li>
+                        <li><i class="fas fa-envelope"></i> info@techshop.ru</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Москва, ул. Примерная, 15</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="copyright">
+                &copy; 2023 TechShop. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>
