@@ -130,7 +130,7 @@ def login():
                     description="неверный логин или пароль!"
                 )
             session_login["user_id"]=proverka_proverka.id
-
+#xeexeex
         return jsonify({"message": "True"})
     session_login.clear()
     return render_template("login.html")
