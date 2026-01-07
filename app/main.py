@@ -242,5 +242,7 @@ def search():
 
 
     return render_template("search.html",q=q,products=search_stmt,results_count=results_count,page=page,total_results=total_results,results_all=results_all, total_categories=total_categories,cur_category=category,price=price,price_order=price_order)
+
+# main
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8081, debug=True)
