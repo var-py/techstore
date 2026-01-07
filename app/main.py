@@ -17,7 +17,16 @@ app.config['SECRET_KEY'] =config['SESSION_A']
 
 @app.route("/")
 def root():
-    return jsonify({"message": "Привет, Flask работает!"})
+    with Session(engine) as session:
+        stmt = select(Product).limit(4)
+        products = session.scalars(stmt).all()
+        s={}
+        for i in range(len(products)):
+            if products[i].category not in s:
+                s[products[i].category] = 1
+            else:
+                s[products[i].category] += 1
+    return render_template("index.html",products=products,s=s.items()) # [(apple, 1), ()]
 
 @app.route("/hello/<name>")
 def hello(name):
