@@ -243,6 +243,15 @@ def search():
 
     return render_template("search.html",q=q,products=search_stmt,results_count=results_count,page=page,total_results=total_results,results_all=results_all, total_categories=total_categories,cur_category=category,price=price,price_order=price_order)
 
+@app.route("/api/categories/stats")
+def categories_stats():
+    """API endpoint для получения статистики по категориям товаров"""
+    with Session(engine) as session:
+        stmt = select(Product.category, func.count(Product.id)).group_by(Product.category)
+        result = session.execute(stmt).all()
+        stats = {category: count for category, count in result}
+    return jsonify(stats)
+
 # main
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8081, debug=True)
