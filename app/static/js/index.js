@@ -1,4 +1,6 @@
-// Chat Bot Functionality
+
+
+const socket = io("http://localhost:80");
 document.addEventListener('DOMContentLoaded', function() {
     const chatBtn = document.getElementById('chatBtn');
     const chatWindow = document.getElementById('chatWindow');

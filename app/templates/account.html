@@ -16,6 +16,26 @@
             </div>
         </div>
     </header>
+<div class="chat-bot">
+    <div class="chat-btn" id="chatBtn">
+        <i class="fas fa-comments"></i>
+    </div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <h3>Чат с поддержкой</h3>
+            <span id="closeChat"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                Здравствуйте! Чем могу помочь?
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Введите ваше сообщение...">
+            <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
 
     <div class="container">
         <aside class="sidebar">
@@ -114,6 +134,8 @@
             </section>
         </main>
     </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script src="{{ url_for('static', filename='js/account.js') }}"></script>
+
 </body>
 </html>

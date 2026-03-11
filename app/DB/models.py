@@ -18,6 +18,7 @@ class Users(Base):
     email: Mapped[str] = mapped_column(nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
     orders: Mapped[List["Order"]] = relationship(back_populates="users")
+    status: Mapped[bool] = mapped_column(nullable=False, default=False)
     # users_music: Mapped[List["Users_music"]] = relationship(
     #     back_populates="users", cascade="all, delete-orphan"
     # )
@@ -28,10 +29,10 @@ class Admin(Base):
     __tablename__ = "admin"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
-    email: Mapped[str] = mapped_column(nullable=False)
-    password: Mapped[str] = mapped_column(nullable=False)
+    IP: Mapped[str] = mapped_column(nullable=False)
+    user_id: Mapped[int] = mapped_column(nullable=False)
     def __repr__(self) -> str:
-        return f"admin(id={self.id}, name={self.name}, email={self.email}, password={self.password})"
+        return f"admin(id={self.id}, name={self.name}, IP={self.IP}, user_id={self.user_id})"
 
 class Order(Base):
     __tablename__ = "order"
@@ -51,9 +52,10 @@ class Product(Base):
     photo: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=False)
     category: Mapped[str] = mapped_column(nullable=False)
+    brand: Mapped[str] = mapped_column(nullable=False)
     # favorite: Mapped[List["Favorite"]] = relationship(back_populates="music")
     def __repr__(self) -> str:
-        return f"product(id={self.id}, title={self.title},price={self.price},photo={self.photo},description={self.description}, category={self.category})"
+        return f"product(id={self.id}, title={self.title},price={self.price},photo={self.photo},description={self.description}, category={self.category}, brand={self.brand})"
 class Order_item(Base):
     __tablename__ = "order_item"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -72,3 +74,21 @@ class Code(Base):
     email: Mapped[str] = mapped_column(nullable=False)
     def __repr__(self) -> str:
         return f"code(id={self.id}, code={self.code}, email={self.email})"
+class CountProduct(Base):
+    __tablename__ = "count_product"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    count: Mapped[str] = mapped_column(nullable=False)
+    sale: Mapped[str] = mapped_column(nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("product.id"))
+    def __repr__(self) -> str:
+        return f"code(id={self.id}, code={self.count}, email={self.sale}, product_id={self.product_id})"
+class Massages(Base):
+    __tablename__ = "massages"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    text: Mapped[str] = mapped_column(nullable=False)
+    time_send: Mapped[str] = mapped_column(nullable=False)
+    from_user: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    to_user: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    is_read: Mapped[bool] = mapped_column(nullable=False, default=False)
+    def __repr__(self) -> str:
+        return f"code(id={self.id},text={self.text})"

@@ -1,20 +1,24 @@
-from flask import Flask, jsonify, render_template, request, abort, session as session_login, redirect, session
-from sqlalchemy import select, insert
+import datetime
+from flask_socketio import SocketIO
+from flask_socketio import emit
+from flask import Flask, jsonify, render_template, request, abort, session as session_login, redirect
+from sqlalchemy import select, insert, or_, and_
 from sqlalchemy.orm import Session
 from sqlalchemy import update
 from sqlalchemy.util import methods_equivalent
 from sqlalchemy import func
 
-from app.DB.models import Product, Users, Code
+from app.DB.models import Product, Users, Code, Admin, CountProduct, Massages
 from app.DB.session import engine, config
 from app.utils.security import hash_password, verify_password
 from app.utils.sendmail import send_code
 
 app = Flask(__name__)
+
 app.config['JSON_AS_ASCII'] = False
 app.json.ensure_ascii = False
 app.config['SECRET_KEY'] =config['SESSION_A']
-
+socketio = SocketIO(app, cors_allowed_origins="*")
 @app.route("/")
 def root():
     with Session(engine) as session:
@@ -70,8 +74,18 @@ def account():
         with Session(engine) as session:
             name=select(Users).where(Users.id==user_id)
             user=session.scalar(name)
+    real_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    print(real_ip)
+    proverkaIP = select(Admin).where(Admin.IP == real_ip,Admin.user_id==user_id)
+    proverka_proverkaIP = session.scalar(proverkaIP)
+    if proverka_proverkaIP is not None:
+        countusers = select(Users).where(Users.status==True)
+        countusersa = session.scalars(countusers).all()
+        countusersS = len(countusersa)
+        return render_template("admin.html",name=user.name,email=user.email,countusers=countusersS)
+    else:
+        return render_template("account.html",name=user.name,email=user.email)
 
-    return render_template("account.html",name=user.name,email=user.email)
 
 @app.route("/product/<product_id>")
 def product(product_id):
@@ -130,12 +144,35 @@ def login():
                     description="неверный логин или пароль!"
                 )
             session_login["user_id"]=proverka_proverka.id
-#xeexeex
+            qqq=update(Users).values(status=True).where(Users.email==email)
+            status_user = session.execute(qqq)
+            session.commit()
         return jsonify({"message": "True"})
     session_login.clear()
     return render_template("login.html")
+@socketio.on("connect")
+def handle_connect():
+    user_id = session_login.get("user_id")
+    with Session(engine) as session:
+        qqq = update(Users).values(status=True).where(Users.id == user_id)
+        session.execute(qqq)
+        session.commit()
+    print("CONNECTED",user_id)
+@socketio.on("disconnect")
+def handle_disconnect():
+    user_id = session_login.get("user_id")
+    with Session(engine) as session:
+        qqq = update(Users).values(status=False).where(Users.id == user_id)
+        session.execute(qqq)
+        session.commit()
+    print("DISCONNECTED",user_id)
 @app.route("/logout")
 def logout():
+    user_id = session_login.get("user_id")
+    with Session(engine) as session:
+        qqq = update(Users).values(status=False).where(Users.id==user_id)
+        session.execute(qqq)
+        session.commit()
     session_login.clear()
     return redirect("/login")
 @app.route("/forgot/password")
@@ -251,7 +288,89 @@ def categories_stats():
         result = session.execute(stmt).all()
         stats = {category: count for category, count in result}
     return jsonify(stats)
+@app.route("/api/users")
+def users():
+    user_id = session_login.get("user_id")
+    with Session(engine) as session:
+        all_users=select(Users)
+    all_users = session.execute(all_users).scalars().all()
+    stats = []
+    for user in all_users:
+        all_massages=select(Massages).where(Massages.to_user==user.id, Massages.from_user==user_id)
+        massages_send=session.execute(all_massages).scalars().all()
+        text = None
+        if len(massages_send)>0:
+            text=massages_send[-1].text
+        unread_masseges=select(Massages).where(Massages.to_user==user.id, Massages.from_user==user_id,Massages.is_read!=True)
+        unread_masseges = session.execute(unread_masseges).scalars().all()
+        unread=len(unread_masseges)
+        last_seen=datetime.datetime.utcnow()
+        d = {"id": user.id, "name": user.name, "email": user.email,"status": user.status, "lastMessage": text , "unread": unread, "lastSeen":last_seen}
 
-# main
+        stats.append(d)
+    return jsonify(stats)
+@app.route("/api/chat/<user_id>", methods=["GET"])
+def chats(user_id):
+    admin_id = session_login.get("user_id")
+    with Session(engine) as session:
+        all_massages=select(Massages).where(
+            or_(
+                and_(Massages.to_user==admin_id, Massages.from_user==user_id),
+                and_(Massages.from_user==admin_id, Massages.to_user==user_id)
+            )
+        )
+    all_massages = session.execute(all_massages).scalars().all()
+    stats = []
+    for massage in all_massages:
+        if massage.from_user==user_id:
+            sender="user"
+        elif massage.from_user==admin_id:
+            sender="admin"
+        d = {"id": massage.id, "text": massage.text, "sender": sender,"time": massage.time_send}
+
+        stats.append(d)
+    return jsonify(stats)
+@app.route("/api/massages", methods=["POST"])
+def massages():
+    data = request.json
+    user_id = session_login.get("user_id")
+    text=data.get("text")
+    time_send = datetime.datetime.utcnow()
+    to_user = data.get("to_user")
+    with Session(engine) as session:
+        stmt = insert(Massages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=to_user)
+        session.execute(stmt)
+        session.commit()
+    return jsonify({"id": user_id})
+@app.route("/api/add/product", methods= ["POST"])
+def add_product():
+    name=request.form.get("Name")
+    price=request.form.get("price")
+    category=request.form.get("category")
+    brand=request.form.get("brand")
+    description=request.form.get("description")
+    count=request.form.get("count")
+    sale=request.form.get("sale")
+    art=request.form.get("art")
+
+    user_id = session_login.get("user_id")
+    if user_id is None:
+        return redirect("/login")
+    else:
+        with Session(engine) as session:
+            name = select(Users).where(Users.id == user_id)
+            user = session.scalar(name)
+
+    with Session(engine) as session:
+        stmt = insert(Product).values(id=int(art),title=name, price=int(price), category=category, brand=brand, description=description)
+        commit = session.execute(stmt)
+        stmt2=insert(CountProduct).values(count=count,sale=sale,product_id=art)
+        commit = session.execute(stmt2)
+        session.commit()
+        countusers=select(Users).where(Users.status==True)
+        countusersa=session.scalars(countusers).all()
+        countusersS=len(countusersa)
+        return render_template("admin.html", name=user.name, email=user.email,countusers=countusersS )
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=80, debug=True)
