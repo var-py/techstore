@@ -82,7 +82,12 @@ def account():
         countusers = select(Users).where(Users.status==True)
         countusersa = session.scalars(countusers).all()
         countusersS = len(countusersa)
-        return render_template("admin.html",name=user.name,email=user.email,countusers=countusersS)
+        # TODO
+        with Session(engine) as session:
+            all_massages = select(Massages).where(and_(Massages.to_user == user_id,Massages.is_read == False))
+        all_massages = session.execute(all_massages).scalars().all()
+        stats = []
+        return render_template("admin.html",name=user.name,email=user.email,countusers=countusersS,all_massages=len(all_massages))
     else:
         return render_template("account.html",name=user.name,email=user.email)
 

@@ -33,8 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const sections = document.querySelectorAll('.content-section');
 
         menuLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
+            link.addEventListener('click', function(e){
+             if (this.getAttribute('href') === '/logout') {
                 e.preventDefault();
+                if (confirm('Вы уверены, что хотите выйти?')) {
+                    window.location.href='/logout'
+                }
+                return;
+            }
+
 
                 // Убираем активный класс у всех пунктов
                 menuLinks.forEach(item => item.classList.remove('active'));
@@ -983,9 +990,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Настройка общих обработчиков событий
     function setupEventListeners() {
         // Выход из системы
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            if (confirm('Вы уверены, что хотите выйти?')) {
-                window.location.href = 'login.html';
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            if (this.getAttribute('href') === '/logout') {
+                e.preventDefault();
+                if (confirm('Вы уверены, что хотите выйти?')) {
+                    window.location.href='/logout'
+                }
+                return;
             }
         });
 
