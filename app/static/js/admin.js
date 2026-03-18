@@ -6,7 +6,11 @@ let currentChatUser = null;
 let messages = []
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Инициализация
+    socket.on('user_status', ({ user_id, status }) => {
+        if (currentChatUser.id==user_id){
+        document.getElementById('currentUserStatus').textContent =
+            user.status ? 'В сети' : 'Не в сети';}
+    });
     init();
 
     // Переменные
@@ -722,7 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
         div.className = `user-item ${user.unread > 0 ? 'has-unread' : ''}`;
         div.dataset.userId = user.id;
 
-        const lastSeen = new Date(user.lastSeen);
+        const lastSeen = new Date(user.lastSeen +'Z');
         const timeAgo = getTimeAgo(lastSeen);
 
         div.innerHTML = `

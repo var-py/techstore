@@ -1,8 +1,10 @@
 import datetime
+from email.message import Message
+
 from flask_socketio import SocketIO
 from flask_socketio import emit
 from flask import Flask, jsonify, render_template, request, abort, session as session_login, redirect
-from sqlalchemy import select, insert, or_, and_
+from sqlalchemy import select, insert, or_, and_, distinct
 from sqlalchemy.orm import Session
 from sqlalchemy import update
 from sqlalchemy.util import methods_equivalent
@@ -79,8 +81,12 @@ def account():
     proverkaIP = select(Admin).where(Admin.IP == real_ip,Admin.user_id==user_id)
     proverka_proverkaIP = session.scalar(proverkaIP)
     if proverka_proverkaIP is not None:
-        countusers = select(Users).where(Users.status==True)
-        countusersa = session.scalars(countusers).all()
+        query = (
+            select(func.count(distinct(Users.id)))
+            .join(Massages, Users.id == Massages.from_user)
+            .where(Users.status == True, Users.id != user_id)
+        )
+        countusersa = session.scalars(query).all()
         countusersS = len(countusersa)
         # TODO
         with Session(engine) as session:
@@ -158,23 +164,25 @@ def login():
 @socketio.on("connect")
 def handle_connect():
     user_id = session_login.get("user_id")
+    print("CONNECTED", user_id)
     if user_id is None:
         return
     with Session(engine) as session:
         qqq = update(Users).values(status=True).where(Users.id == user_id)
         session.execute(qqq)
         session.commit()
-    print("CONNECTED",user_id)
+        emit("user_status", {"user_id": user_id, "status": True}, broadcast=True)
 @socketio.on("disconnect")
 def handle_disconnect():
     user_id = session_login.get("user_id")
+    print("DISCONNECTED", user_id)
     if user_id is None:
         return
     with Session(engine) as session:
         qqq = update(Users).values(status=False).where(Users.id == user_id)
         session.execute(qqq)
         session.commit()
-    print("DISCONNECTED",user_id)
+        emit("user_status", {"user_id": user_id, "status": False}, broadcast=True)
 @app.route("/logout")
 def logout():
     user_id = session_login.get("user_id")
@@ -305,8 +313,11 @@ def users():
     all_users = session.execute(all_users).scalars().all()
     stats = []
     for user in all_users:
-        all_massages=select(Massages).where(Massages.to_user==user.id, Massages.from_user==user_id)
+        all_massages=select(Massages).where(Massages.to_user==user.id, Massages.from_user==user_id, Massages.to_user!=user_id)
+
         massages_send=session.execute(all_massages).scalars().all()
+        if not massages_send:
+            continue
         text = None
         if len(massages_send)>0:
             text=massages_send[-1].text
@@ -314,7 +325,7 @@ def users():
         unread_masseges = session.execute(unread_masseges).scalars().all()
         unread=len(unread_masseges)
         last_seen=datetime.datetime.utcnow()
-        d = {"id": user.id, "name": user.name, "email": user.email,"status": user.status, "lastMessage": text , "unread": unread, "lastSeen":last_seen}
+        d = {"id": user.id, "name": user.name, "email": user.email,"status": user.status, "lastMessage": text , "unread": unread, "lastSeen":massages_send[-1].time_send}
 
         stats.append(d)
     return jsonify(stats)
@@ -324,8 +335,8 @@ def chats(user_id):
     with Session(engine) as session:
         all_massages=select(Massages).where(
             or_(
-                and_(Massages.to_user==admin_id, Massages.from_user==user_id),
-                and_(Massages.from_user==admin_id, Massages.to_user==user_id)
+                and_(Massages.to_user==admin_id, Massages.from_user==user_id, Massages.to_user!=admin_id),
+                and_(Massages.from_user==admin_id, Massages.to_user==user_id, Massages.to_user!=admin_id)
             )
         )
     all_massages = session.execute(all_massages).scalars().all()
@@ -382,4 +393,4 @@ def add_product():
         return render_template("admin.html", name=user.name, email=user.email,countusers=countusersS )
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=80, debug=True)
+    socketio.run(app, host="0.0.0.0", port=80, debug=True, allow_unsafe_werkzeug=True)
