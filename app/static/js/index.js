@@ -1,6 +1,6 @@
 
 
-const socket = io("http://localhost:80");
+const socket = io();
 document.addEventListener('DOMContentLoaded', function() {
     const chatBtn = document.getElementById('chatBtn');
     const chatWindow = document.getElementById('chatWindow');

@@ -1,6 +1,6 @@
 
 
-const socket = io("http://localhost:80")
+const socket = io()
 document.addEventListener('DOMContentLoaded', function() {
     // Переключение между разделами
     const menuLinks = document.querySelectorAll('.sidebar-menu a');

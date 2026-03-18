@@ -158,6 +158,8 @@ def login():
 @socketio.on("connect")
 def handle_connect():
     user_id = session_login.get("user_id")
+    if user_id is None:
+        return
     with Session(engine) as session:
         qqq = update(Users).values(status=True).where(Users.id == user_id)
         session.execute(qqq)
@@ -166,6 +168,8 @@ def handle_connect():
 @socketio.on("disconnect")
 def handle_disconnect():
     user_id = session_login.get("user_id")
+    if user_id is None:
+        return
     with Session(engine) as session:
         qqq = update(Users).values(status=False).where(Users.id == user_id)
         session.execute(qqq)
@@ -378,4 +382,4 @@ def add_product():
         return render_template("admin.html", name=user.name, email=user.email,countusers=countusersS )
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80, debug=True)
+    socketio.run(app, host="0.0.0.0", port=80, debug=True)

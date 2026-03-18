@@ -1,6 +1,6 @@
 
 
-const socket = io("http://localhost:80");
+const socket = io();
 let products=[];
 let currentChatUser = null;
 let messages = []
@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Обновляем заголовок чата
         document.getElementById('currentUserName').textContent = user.name;
         document.getElementById('currentUserStatus').textContent =
-            user.status === 'online' ? 'В сети' : 'Был(а) недавно';
+            user.status ? 'В сети' : 'Не в сети';
 
         // Показываем поле ввода
         document.getElementById('chatInputArea').style.display = 'block';
