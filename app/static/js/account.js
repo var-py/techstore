@@ -49,10 +49,26 @@ document.addEventListener('DOMContentLoaded', function() {
     sendMessage.addEventListener('click', function() {
         if (userInput.value.trim() !== '') {
             addMessage(userInput.value, 'user');
-            userInput.value = '';
+
 
             // Bot response after a short delay
-            setTimeout(botResponse, 1000);
+            //setTimeout(botResponse, 1000);
+             const url = `/api/massages`;
+            const response = fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: userInput.value,
+                    to_user: 1 // TODO: change to_user to real admin
+                }),
+
+                credentials: 'same-origin'
+
+            });
+            userInput.value = '';
         }
     });
 
