@@ -335,7 +335,7 @@ def chats(user_id):
     with Session(engine) as session:
         all_massages=select(Massages).where(
             or_(
-                and_(Massages.to_user==admin_id, Massages.from_user==user_id, Massages.to_user!=admin_id),
+                and_(Massages.to_user==admin_id, Massages.from_user==user_id, Massages.from_user!=admin_id),
                 and_(Massages.from_user==admin_id, Massages.to_user==user_id, Massages.to_user!=admin_id)
             )
         )
