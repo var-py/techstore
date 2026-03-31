@@ -313,7 +313,12 @@ def users():
     all_users = session.execute(all_users).scalars().all()
     stats = []
     for user in all_users:
-        all_massages=select(Massages).where(Massages.to_user==user.id, Massages.from_user==user_id, Massages.to_user!=user_id)
+        all_massages = select(Massages).where(
+            or_(
+                and_(Massages.to_user == user_id, Massages.from_user == user.id, Massages.from_user != user_id),
+                and_(Massages.from_user == user_id, Massages.to_user == user.id, Massages.to_user != user_id)
+            )
+        )
 
         massages_send=session.execute(all_massages).scalars().all()
         if not massages_send:
@@ -324,7 +329,7 @@ def users():
         unread_masseges=select(Massages).where(Massages.to_user==user.id, Massages.from_user==user_id,Massages.is_read!=True)
         unread_masseges = session.execute(unread_masseges).scalars().all()
         unread=len(unread_masseges)
-        last_seen=datetime.datetime.utcnow()
+
         d = {"id": user.id, "name": user.name, "email": user.email,"status": user.status, "lastMessage": text , "unread": unread, "lastSeen":massages_send[-1].time_send}
 
         stats.append(d)
@@ -332,6 +337,7 @@ def users():
 @app.route("/api/chat/<user_id>", methods=["GET"])
 def chats(user_id):
     admin_id = session_login.get("user_id")
+    user_id = int(user_id)
     with Session(engine) as session:
         all_massages=select(Massages).where(
             or_(
