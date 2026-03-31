@@ -37,7 +37,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Open chat window
     chatBtn.addEventListener('click', function() {
-        chatWindow.style.display = 'flex';
+            if (chatWindow.style.display=='flex'){
+            chatWindow.style.display='none'}
+            else {
+             fetch(`/api/admin/chat`, {
+              method: 'GET',
+              headers: { 'Accept': 'application/json' },
+              credentials: 'same-origin',
+            })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`Ошибка: ${response.status}`);
+                }
+                return response.json(); // ⏳ ждём парсинг
+              })
+              .then(massagesInChat => {
+                // Очищаем контейнер
+                chatMessages.innerHTML = '';
+                // Добавляем сообщения
+                massagesInChat.forEach(message => {
+                    addMessage(message.text, message.sender);
+                });
+                chatWindow.style.display = 'flex';
+
+                // Прокручиваем вниз
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+              })
+              .catch(error => {
+                console.error(error);
+              });
+            }
     });
 
     // Close chat window
@@ -62,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     text: userInput.value,
-                    to_user: 1 // TODO: change to_user to real admin
+                    to_user: 3 // TODO: change to_user to real admin
                 }),
 
                 credentials: 'same-origin'

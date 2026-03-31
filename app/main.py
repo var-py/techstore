@@ -356,6 +356,30 @@ def chats(user_id):
 
         stats.append(d)
     return jsonify(stats)
+@app.route("/api/admin/chat", methods=["GET"])
+def chatsForAdmin():
+    user_id = session_login.get("user_id")
+
+    with Session(engine) as session:
+        admin_query = select(Admin.user_id)
+        admin_ids = session.execute(admin_query).scalars().all()
+        all_massages=select(Massages).where(
+            or_(
+                and_(Massages.to_user.in_(admin_ids), Massages.from_user==user_id, Massages.from_user.notin_(admin_ids)),
+                and_(Massages.from_user.in_(admin_ids), Massages.to_user==user_id, Massages.to_user.notin_(admin_ids))
+            )
+        )
+        all_massages = session.execute(all_massages).scalars().all()
+    stats = []
+    for massage in all_massages:
+        if massage.from_user==user_id:
+            sender="user"
+        elif massage.from_user in admin_ids:
+            sender="bot"
+        d = {"id": massage.id, "text": massage.text, "sender": sender,"time": massage.time_send}
+
+        stats.append(d)
+    return jsonify(stats)
 @app.route("/api/massages", methods=["POST"])
 def massages():
     data = request.json
