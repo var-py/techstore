@@ -88,7 +88,6 @@ def account():
         )
         countusersa = session.scalars(query).all()
         countusersS = len(countusersa)
-        # TODO
         with Session(engine) as session:
             all_massages = select(Massages).where(and_(Massages.to_user == user_id,Massages.is_read == False))
         all_massages = session.execute(all_massages).scalars().all()
@@ -391,6 +390,21 @@ def massages():
         stmt = insert(Massages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=to_user)
         session.execute(stmt)
         session.commit()
+    return jsonify({"id": user_id})
+@app.route("/api/admin/massages", methods=["POST"])
+def massagesForAdmin():
+    user_id = session_login.get("user_id")
+    data = request.json
+    text=data.get("text")
+    time_send = datetime.datetime.utcnow()
+
+    with Session(engine) as session:
+        name = select(Admin)
+        admins= session.scalars(name)
+        for i in admins:
+            stmt = insert(Massages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=i.user_id)
+            session.execute(stmt)
+            session.commit()
     return jsonify({"id": user_id})
 @app.route("/api/add/product", methods= ["POST"])
 def add_product():

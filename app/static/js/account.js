@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Bot response after a short delay
             //setTimeout(botResponse, 1000);
-             const url = `/api/massages`;
+             const url = `/api/admin/massages`;
             const response = fetch(url, {
                 method: 'POST',
                 headers: {
@@ -90,8 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    text: userInput.value,
-                    to_user: 3 // TODO: change to_user to real admin
+                    text: userInput.value
                 }),
 
                 credentials: 'same-origin'
