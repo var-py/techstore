@@ -927,46 +927,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 credentials: 'same-origin'
             });
         // Имитируем ответ пользователя через 1-3 секунды
-        simulateUserResponse();
+
     }
 
     // Имитация ответа пользователя
-    function simulateUserResponse() {
-        if (!currentChatUser) return;
 
-        const responses = [
-            "Спасибо за информацию!",
-            "Понятно, буду ждать",
-            "Можно уточнить еще один момент?",
-            "Отлично, это то что нужно",
-            "Спасибо за помощь!"
-        ];
-
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-
-        setTimeout(() => {
-            const responseMessage = {
-                id: Date.now(),
-                text: randomResponse,
-                sender: 'user',
-                time: new Date().toISOString()
-            };
-
-            messages[currentChatUser.id].push(responseMessage);
-            saveMessages();
-
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageElement = createMessageElement(responseMessage);
-            messagesContainer.appendChild(messageElement);
-
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            // Обновляем счетчик непрочитанных
-            currentChatUser.unread++;
-            updateUnreadCount();
-
-        }, 1000 + Math.random() * 2000);
-    }
 
     // Обновление статуса онлайн
 
