@@ -1,5 +1,5 @@
 import datetime
-from email.message import Message
+
 
 from flask_socketio import SocketIO
 from flask_socketio import emit,join_room,leave_room
@@ -408,7 +408,7 @@ def massages():
         stmt = insert(Massages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=to_user)
         session.execute(stmt)
         session.commit()
-        emit("massage_touser", {"user_id": user_id, "text": text, "time_send": time_send}, to=str(to_user))
+        socketio.emit("massage_touser", {"user_id": user_id, "text": text, "time_send": time_send}, to=str(to_user))
     return jsonify({"id": user_id})
 @app.route("/api/admin/massages", methods=["POST"])
 def massagesForAdmin():
@@ -424,7 +424,7 @@ def massagesForAdmin():
             stmt = insert(Massages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=i.user_id)
             session.execute(stmt)
             session.commit()
-            emit("massage_toadmin", {"user_id": user_id, "text": text,"time_send": time_send}, to="admins")
+            socketio.emit("massage_toadmin", {"user_id": user_id, "text": text,"time_send": time_send}, to="admins")
     return jsonify({"id": user_id})
 @app.route("/api/add/product", methods= ["POST"])
 def add_product():
