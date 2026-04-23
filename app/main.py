@@ -2,7 +2,7 @@ import datetime
 from email.message import Message
 
 from flask_socketio import SocketIO
-from flask_socketio import emit
+from flask_socketio import emit,join_room,leave_room
 from flask import Flask, jsonify, render_template, request, abort, session as session_login, redirect
 from sqlalchemy import select, insert, or_, and_, distinct
 from sqlalchemy.orm import Session
@@ -171,6 +171,15 @@ def handle_connect():
         session.execute(qqq)
         session.commit()
         emit("user_status", {"user_id": user_id, "status": True}, broadcast=True)
+        name_u = select(Users).where(Users.user_id == user_id)
+        userconn = session.scalar(name_u)
+        if userconn is not None:
+            join_room("users")
+            join_room(str(user_id))
+        name = select(Admin).where(Admin.user_id == user_id)
+        admin = session.scalar(name)
+        if admin is not None:
+            join_room("admins")
 @socketio.on("disconnect")
 def handle_disconnect():
     user_id = session_login.get("user_id")
@@ -182,6 +191,15 @@ def handle_disconnect():
         session.execute(qqq)
         session.commit()
         emit("user_status", {"user_id": user_id, "status": False}, broadcast=True)
+        name_u = select(Users).where(Users.user_id == user_id)
+        userconn = session.scalar(name_u)
+        if userconn is not None:
+            leave_room("users")
+            leave_room(str(user_id))
+        name = select(Admin).where(Admin.user_id == user_id)
+        admin = session.scalar(name)
+        if admin is not None:
+            leave_room("admins")
 @app.route("/logout")
 def logout():
     user_id = session_login.get("user_id")
@@ -390,6 +408,7 @@ def massages():
         stmt = insert(Massages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=to_user)
         session.execute(stmt)
         session.commit()
+        emit("massage_touser", {"user_id": user_id, "text": text, "time_send": time_send}, to=str(to_user))
     return jsonify({"id": user_id})
 @app.route("/api/admin/massages", methods=["POST"])
 def massagesForAdmin():
@@ -405,6 +424,7 @@ def massagesForAdmin():
             stmt = insert(Massages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=i.user_id)
             session.execute(stmt)
             session.commit()
+            emit("massage_toadmin", {"user_id": user_id, "text": text,"time_send": time_send}, to="admins")
     return jsonify({"id": user_id})
 @app.route("/api/add/product", methods= ["POST"])
 def add_product():

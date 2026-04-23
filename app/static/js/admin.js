@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('currentUserStatus').textContent =
             user.status ? 'В сети' : 'Не в сети';}
     });
+        socket.on("massage_toadmin", (data) => {
+      console.log("Пришло сообщение:", data);
+
+      const { user_id, text, time_send } = data;
+      loadChatMessages(user_id)
+      console.log(user_id, text, time_send);
+    });
     init();
 
     // Переменные
@@ -831,8 +838,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function createMessageElement(message) {
         const div = document.createElement('div');
         div.className = `message ${message.sender === 'admin' ? 'outgoing' : 'incoming'}`;
+        if (!message.time.endsWith("Z")){
+            message.time = message.time + 'Z'
+        }
 
-        const time = new Date(message.time + 'Z');
+        const time = new Date(message.time);
         const timeString = time.toLocaleTimeString(undefined, {
             hour: '2-digit',
             minute: '2-digit'
