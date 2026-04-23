@@ -171,7 +171,7 @@ def handle_connect():
         session.execute(qqq)
         session.commit()
         emit("user_status", {"user_id": user_id, "status": True}, broadcast=True)
-        name_u = select(Users).where(Users.user_id == user_id)
+        name_u = select(Users).where(Users.id == user_id)
         userconn = session.scalar(name_u)
         if userconn is not None:
             join_room("users")
@@ -191,7 +191,7 @@ def handle_disconnect():
         session.execute(qqq)
         session.commit()
         emit("user_status", {"user_id": user_id, "status": False}, broadcast=True)
-        name_u = select(Users).where(Users.user_id == user_id)
+        name_u = select(Users).where(Users.id == user_id)
         userconn = session.scalar(name_u)
         if userconn is not None:
             leave_room("users")
