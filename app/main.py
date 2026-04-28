@@ -455,6 +455,21 @@ def add_product():
         countusersa=session.scalars(countusers).all()
         countusersS=len(countusersa)
         return render_template("admin.html", name=user.name, email=user.email,countusers=countusersS )
+certif="/etc/letsencrypt/live/varpy.ru/fullchain.pem"
+keyser= "/etc/letsencrypt/live/varpy.ru/privkey.pem"
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=80, debug=True, allow_unsafe_werkzeug=True)
+    if __name__ == '__main__':
+        try:
+            socketio.run(
+                app,
+                host='0.0.0.0',
+                port=443,
+                debug=False,
+                allow_unsafe_werkzeug=True,
+                ssl_context=(
+                    certif, keyser
+                )
+            )
+        except:
+            socketio.run(app, host="0.0.0.0", port=80, debug=True, allow_unsafe_werkzeug=True)
