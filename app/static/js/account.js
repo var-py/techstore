@@ -5,7 +5,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Переключение между разделами
     const menuLinks = document.querySelectorAll('.sidebar-menu a');
     const sections = document.querySelectorAll('.content-section');
+    socket.on("massage_touser", (data) => {
+      console.log("Пришло сообщение:", data);
 
+      const { user_id, text, time_send } = data;
+      addMessage(text,"admin")
+      console.log(user_id, text, time_send);
+    });
     menuLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             if (this.getAttribute('href') === '/logout') {
