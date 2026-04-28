@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("Пришло сообщение:", data);
 
       const { user_id, text, time_send } = data;
-      addMessage(text,"admin")
+      addMessage(text,"bot")
       console.log(user_id, text, time_send);
     });
     menuLinks.forEach(link => {
