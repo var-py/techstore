@@ -817,7 +817,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveMessages();
         }
     }
-    function ReadMassages(user_id)
+    function ReadMassages(user_id){
         const url = `/api/userchatread`;
             const response = fetch(url, {
                 method: 'POST',
@@ -832,6 +832,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 credentials: 'same-origin'
             });
+            }
     // Загрузка сообщений
     function loadChatMessages(userId) {
         const messagesContainer = document.getElementById('chatMessages');
