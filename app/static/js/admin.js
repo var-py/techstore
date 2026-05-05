@@ -18,6 +18,23 @@ document.addEventListener('DOMContentLoaded', function() {
       loadChatMessages(user_id)
       console.log(user_id, text, time_send);
     });
+        socket.on("user_disconnect", (data) => {
+      console.log("Пришло сообщение:", data);
+      const {user_id, user_status} = data;
+      console.log(user_id, user_status);
+      if (currentChatUser.id==user_id){
+        document.getElementById('currentUserStatus').textContent =
+            user_status ? 'В сети' : 'Не в сети';}
+    });
+
+        socket.on("user_connect", (data) => {
+      console.log("Пришло сообщение:", data);
+      const {user_id, user_status} = data;
+      console.log(user_id, user_status);
+      if (currentChatUser.id==user_id){
+        document.getElementById('currentUserStatus').textContent =
+            user_status ? 'В сети' : 'Не в сети';}
+    });
     init();
 
     // Переменные

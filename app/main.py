@@ -175,6 +175,8 @@ def handle_connect():
         userconn = session.scalar(name_u)
         if userconn is not None:
             join_room("users")
+            socketio.emit("user_connect", {"user_id": user_id, "user_status": True},
+                          to=str("admins"))
             join_room(str(user_id))
         name = select(Admin).where(Admin.user_id == user_id)
         admin = session.scalar(name)
@@ -195,11 +197,14 @@ def handle_disconnect():
         userconn = session.scalar(name_u)
         if userconn is not None:
             leave_room("users")
+            socketio.emit("user_disconnect", {"user_id": user_id, "user_status": False},
+                          to=str("admins"))
             leave_room(str(user_id))
         name = select(Admin).where(Admin.user_id == user_id)
         admin = session.scalar(name)
         if admin is not None:
             leave_room("admins")
+
 @app.route("/logout")
 def logout():
     user_id = session_login.get("user_id")
