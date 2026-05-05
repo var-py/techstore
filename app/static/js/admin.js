@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     socket.on('user_status', ({ user_id, status }) => {
         if (currentChatUser.id==user_id){
         document.getElementById('currentUserStatus').textContent =
-            user.status ? 'В сети' : 'Не в сети';}
+            status ? 'В сети' : 'Не в сети';}
     });
         socket.on("massage_toadmin", (data) => {
       console.log("Пришло сообщение:", data);
