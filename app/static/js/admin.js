@@ -7,7 +7,7 @@ let messages = []
 
 document.addEventListener('DOMContentLoaded', function() {
     socket.on('user_status', ({ user_id, status }) => {
-        if (currentChatUser.id==user_id){
+        if (currentChatUser!=null && currentChatUser.id==user_id){
         document.getElementById('currentUserStatus').textContent =
             status ? 'В сети' : 'Не в сети';}
     });
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("Пришло сообщение:", data);
       const {user_id, user_status} = data;
       console.log(user_id, user_status);
-      if (currentChatUser.id==user_id){
+      if (currentChatUser!=null && currentChatUser.id==user_id){
         document.getElementById('currentUserStatus').textContent =
             user_status ? 'В сети' : 'Не в сети';}
     });
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("Пришло сообщение:", data);
       const {user_id, user_status} = data;
       console.log(user_id, user_status);
-      if (currentChatUser.id==user_id){
+      if (currentChatUser!=null && currentChatUser.id==user_id){
         document.getElementById('currentUserStatus').textContent =
             user_status ? 'В сети' : 'Не в сети';}
     });
