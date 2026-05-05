@@ -364,6 +364,7 @@ def userchatread():
     with Session(engine) as session:
         massage_status=update(Massages).values(is_read=True).where(Massages.from_user==user_id, Massages.to_user==admin_id)
         session.execute(massage_status)
+        session.commit()
     return jsonify({"status":True})
 @app.route("/api/chat/<user_id>", methods=["GET"])
 def chats(user_id):
