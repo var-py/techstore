@@ -817,7 +817,21 @@ document.addEventListener('DOMContentLoaded', function() {
             saveMessages();
         }
     }
+    function ReadMassages(user_id)
+        const url = `/api/userchatread`;
+            const response = fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                user_id: user_id
 
+                    }),
+
+                credentials: 'same-origin'
+            });
     // Загрузка сообщений
     function loadChatMessages(userId) {
         const messagesContainer = document.getElementById('chatMessages');
@@ -841,7 +855,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const messageElement = createMessageElement(message);
                 messagesContainer.appendChild(messageElement);
             });
-
+          ReadMassages(userId)
             // Прокручиваем вниз
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
           })

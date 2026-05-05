@@ -356,6 +356,15 @@ def users():
 
         stats.append(d)
     return jsonify(stats)
+@app.route("/api/userchatread", methods=["POST"])
+def userchatread():
+    data=request.json
+    user_id = data.get("user_id")
+    admin_id = session_login.get("user_id")
+    with Session(engine) as session:
+        massage_status=update(Massages).values(is_read=True).where(Massages.from_user==user_id, Massages.to_user==admin_id)
+        session.execute(massage_status)
+    return jsonify({"status":True})
 @app.route("/api/chat/<user_id>", methods=["GET"])
 def chats(user_id):
     admin_id = session_login.get("user_id")
