@@ -811,11 +811,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadChatMessages(user.id);
 
         // Сбрасываем счетчик непрочитанных
-        if (user.unread > 0) {
-            user.unread = 0;
-            updateUnreadCount();
-            saveMessages();
-        }
+
     }
     function ReadMassages(user_id){
         const url = `/api/userchatread`;
