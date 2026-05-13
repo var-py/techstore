@@ -997,7 +997,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const selectedUser = user.querySelector('.user-unread');
                 selectedUser.display='none'
             }
-        }
+        })
     }
     // Сохранение сообщений в localStorage
     function saveMessages() {
