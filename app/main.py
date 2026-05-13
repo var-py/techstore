@@ -348,7 +348,7 @@ def users():
         text = None
         if len(massages_send)>0:
             text=massages_send[-1].text
-        unread_masseges=select(Massages).where(Massages.to_user==user.id, Massages.from_user==user_id,Massages.is_read!=True)
+        unread_masseges=select(Massages).where(Massages.to_user==user_id, Massages.from_user==user.id,Massages.is_read!=True)
         unread_masseges = session.execute(unread_masseges).scalars().all()
         unread=len(unread_masseges)
 

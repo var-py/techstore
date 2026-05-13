@@ -855,6 +855,7 @@ document.addEventListener('DOMContentLoaded', function() {
           ReadMassages(userId)
             // Прокручиваем вниз
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+          readUserMassages(userId)
           })
           .catch(error => {
             console.error(error);
@@ -988,7 +989,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.getElementById('unreadCount').textContent = totalUnread;
     }
-
+    function readUserMassages(userId) {
+        const users = document.querySelectorAll('.user-item.has-unread');
+        users.forEach(user => {
+            const unreadElement = user.getAttribute('data-user-id');
+            if (unreadElement==userId) {
+                const selectedUser = user.querySelector('.user-unread');
+                selectedUser.display='none'
+            }
+        }
+    }
     // Сохранение сообщений в localStorage
     function saveMessages() {
         localStorage.setItem('adminMessages', JSON.stringify(messages));
