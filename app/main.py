@@ -340,7 +340,7 @@ def users():
                 and_(Massages.to_user == user_id, Massages.from_user == user.id, Massages.from_user != user_id),
                 and_(Massages.from_user == user_id, Massages.to_user == user.id, Massages.to_user != user_id)
             )
-        )
+        ).order_by(Massages.time_send)
 
         massages_send=session.execute(all_massages).scalars().all()
         if not massages_send:
@@ -376,7 +376,7 @@ def chats(user_id):
                 and_(Massages.to_user==admin_id, Massages.from_user==user_id, Massages.from_user!=admin_id),
                 and_(Massages.from_user==admin_id, Massages.to_user==user_id, Massages.to_user!=admin_id)
             )
-        )
+        ).order_by(Massages.time_send)
     all_massages = session.execute(all_massages).scalars().all()
     stats = []
     for massage in all_massages:
@@ -400,7 +400,7 @@ def chatsForAdmin():
                 and_(Massages.to_user.in_(admin_ids), Massages.from_user==user_id, Massages.from_user.notin_(admin_ids)),
                 and_(Massages.from_user.in_(admin_ids), Massages.to_user==user_id, Massages.to_user.notin_(admin_ids))
             )
-        )
+        ).order_by(Massages.time_send)
         all_massages = session.execute(all_massages).scalars().all()
     stats = []
     for massage in all_massages:
