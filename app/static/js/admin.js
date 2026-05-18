@@ -772,7 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return div;
     }
     function lastUserMassage(userId,lastMessage) {
-        const users = document.querySelectorAll('.user-item.has-unread');
+        const users = document.querySelectorAll('.user-item');
         users.forEach(user => {
             const unreadElement = user.getAttribute('data-user-id');
             console.log(userElement)
