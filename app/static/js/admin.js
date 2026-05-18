@@ -771,7 +771,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return div;
     }
-
+    function lastUserMassage(userId,lastMessage) {
+        const users = document.querySelectorAll('.user-item.has-unread');
+        users.forEach(user => {
+            const unreadElement = user.getAttribute('data-user-id');
+            if (unreadElement==userId) {
+                const selectedUser = user.querySelector('.user-last-message');
+                selectedUser.textContent=lastMessage
+            }
+        })
     // Форматирование времени "сколько времени назад"
     function getTimeAgo(date) {
         const now = new Date();
@@ -833,6 +841,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadChatMessages(userId) {
         const messagesContainer = document.getElementById('chatMessages');
         let massagesInChat = [];
+        let lastMessage;
         fetch(`/api/chat/${userId}`, {
           method: 'GET',
           headers: { 'Accept': 'application/json' },
@@ -848,14 +857,17 @@ document.addEventListener('DOMContentLoaded', function() {
             // Очищаем контейнер
             messagesContainer.innerHTML = '';
             // Добавляем сообщения
+
             massagesInChat.forEach(message => {
                 const messageElement = createMessageElement(message);
                 messagesContainer.appendChild(messageElement);
+                lastMessage= massage.text
             });
           ReadMassages(userId)
             // Прокручиваем вниз
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
           readUserMassages(userId)
+          lastUserMassage(userId,lastMessage)
           })
           .catch(error => {
             console.error(error);
