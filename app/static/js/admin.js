@@ -861,7 +861,7 @@ document.addEventListener('DOMContentLoaded', function() {
             massagesInChat.forEach(message => {
                 const messageElement = createMessageElement(message);
                 messagesContainer.appendChild(messageElement);
-                lastMessage= massage.text
+                lastMessage= message.text
             });
           ReadMassages(userId)
             // Прокручиваем вниз
