@@ -979,6 +979,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 credentials: 'same-origin'
             });
+        lastUserMassage(currentChatUser.id,text)
         // Имитируем ответ пользователя через 1-3 секунды
 
     }
