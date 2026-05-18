@@ -779,7 +779,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const selectedUser = user.querySelector('.user-last-message');
                 selectedUser.textContent=lastMessage
             }
-        })
+        })}
     // Форматирование времени "сколько времени назад"
     function getTimeAgo(date) {
         const now = new Date();
