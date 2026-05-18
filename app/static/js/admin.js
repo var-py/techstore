@@ -775,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const users = document.querySelectorAll('.user-item');
         users.forEach(user => {
             const unreadElement = user.getAttribute('data-user-id');
-            console.log(userElement)
+            console.log(unreadElement)
             console.log(userId)
             if (unreadElement==userId) {
                 const selectedUser = user.querySelector('.user-last-message');
