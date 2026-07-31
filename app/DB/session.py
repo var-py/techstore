@@ -18,5 +18,5 @@ with engine.connect() as connection:
     else:
         print("База данных flask_db уже существует")
 engine = create_engine(config["POSTGRESS_URL"], echo=True)
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 print(engine)

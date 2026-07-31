@@ -8,7 +8,25 @@ services:
       - .env
     depends_on:
       - db
+  kafka:
+    image: apache/kafka:4.1.2
+    container_name: kafka
+    ports:
+      - "111:11"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
 
+      KAFKA_LISTENERS: PLAINTEXT://:111,CONTROLLER://:11
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:111
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:11
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
   db:
     image: postgres:16
     container_name: postgres_db
@@ -20,9 +38,22 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_PORT: ${DB_PORT}
     ports:
-      - "5433:5433"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+  redis:
+    image: redis:7
+    container_name: redis_mail
+    ports:
+      - "6379:6379"
+  celery:
+    build: .
+    container_name: celery_worker
+    command: celery -A app.main.celery_app worker --loglevel=info
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
 volumes:
   postgres_data:

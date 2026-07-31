@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 from typing import Optional
 from sqlalchemy import ForeignKey
@@ -22,6 +23,7 @@ class Users(Base):
     # users_music: Mapped[List["Users_music"]] = relationship(
     #     back_populates="users", cascade="all, delete-orphan"
     # )
+    created_at: Mapped[str] = mapped_column(nullable=False, default=datetime.datetime.now(datetime.UTC))
     def __repr__(self) -> str:
         return f"users(id={self.id}, name={self.name}, email={self.email}, password={self.password})"
 
@@ -53,6 +55,7 @@ class Product(Base):
     description: Mapped[str] = mapped_column(nullable=False)
     category: Mapped[str] = mapped_column(nullable=False)
     brand: Mapped[str] = mapped_column(nullable=False)
+    urgency: Mapped[bool] = mapped_column(nullable=False, default=False)
     # favorite: Mapped[List["Favorite"]] = relationship(back_populates="music")
     def __repr__(self) -> str:
         return f"product(id={self.id}, title={self.title},price={self.price},photo={self.photo},description={self.description}, category={self.category}, brand={self.brand})"

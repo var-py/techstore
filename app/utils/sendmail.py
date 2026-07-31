@@ -30,3 +30,26 @@ def send_code(TO):
 
     print("Письмо отправлено!")
     return code
+def send_order(email,name_product):
+    SMTP_HOST = "smtp.mail.ru"  # сервер
+    SMTP_PORT = 587  # порт
+    SMTP_LOGIN = "zxcv6752@mail.ru"  # логин
+    SMTP_PASSWORD = config["PASSWORD_MAIL"]  # пароль
+
+    FROM = SMTP_LOGIN
+    # TO = "varar666@mail.ru"
+
+    # создаём письмо
+    msg = MIMEMultipart()
+    msg["Subject"] = "заказ"
+    msg["From"] = FROM
+    msg["To"] = email
+    body = f"ваш заказ {name_product} приехал!"
+    msg.attach(MIMEText(body, "plain", "utf-8"))
+
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+        server.starttls()
+        server.login(SMTP_LOGIN, SMTP_PASSWORD)
+        server.send_message(msg)
+
+    print("Письмо отправлено!")
