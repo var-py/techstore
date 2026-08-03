@@ -8,3 +8,4 @@ flask-socketio
 alembic==1.18.5
 redis==8.0.1
 celery==5.6.3
+confluent-kafka==2.15.0

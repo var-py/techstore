@@ -1,10 +1,8 @@
 import datetime
 
-from app.main import app, socketio
+from app.socket import socketio
 from app.work_celery import test_task
-from flask_socketio import SocketIO
-from flask_socketio import emit,join_room,leave_room
-from flask import Flask, jsonify, render_template, request, abort, session as session_login, redirect
+from flask import Flask, jsonify, render_template, request, abort, session as session_login, redirect, Blueprint
 from sqlalchemy import select, insert, or_, and_, distinct
 from sqlalchemy.orm import Session
 from sqlalchemy import update
@@ -15,7 +13,10 @@ from app.DB.session import engine, config
 from app.kafka.producer import send_ask_inventory
 from app.utils.security import hash_password, verify_password
 from app.utils.sendmail import send_code, send_order
-@app.route("/")
+
+routes_main = Blueprint('routes_main', __name__)
+
+@routes_main.route("/")
 def root():
     test_task.apply_async(countdown=5,args=(10,))
     with Session(engine) as session:
@@ -29,16 +30,16 @@ def root():
                 s[products[i].category] += 1
     return render_template("index.html",products=products,s=s.items()) # [(apple, 1), ()]
 
-@app.route("/hello/<name>")
+@routes_main.route("/hello/<name>")
 def hello(name):
     return jsonify(message=f"Привет, {name}!")
 
-# @app.route("/new/<id>")
+# @routes_main.route("/new/<id>")
 # def new(id):
 #     stmt = select(Users).where(Users.id==int(id))
 #     user1 = session.scalar(stmt)
 #     return render_template("API.html", name=user1.name,login=user1.login)
-# @app.route("/user/<int:id>", methods=["GET", "POST"])
+# @routes_main.route("/user/<int:id>", methods=["GET", "POST"])
 # def user_edit(id):
 #     stmt = select(Users).where(Users.id == id)
 #     user = session.scalar(stmt)
@@ -50,7 +51,7 @@ def hello(name):
 #         session.commit()
 #
 #     return render_template("API.html", user=user)
-@app.route("/store")
+@routes_main.route("/store")
 def store():
     with Session(engine) as session:
         stmt = select(Product).limit(4)
@@ -62,7 +63,7 @@ def store():
             else:
                 s[products[i].category] += 1
     return render_template("index.html",products=products,s=s.items()) # [(apple, 1), ()]
-@app.route("/account")
+@routes_main.route("/account")
 def account():
     user_id=session_login.get("user_id")
     if user_id is None:
@@ -93,7 +94,7 @@ def account():
         return render_template("account.html",name=user.name,email=user.email)
 
 
-@app.route("/product/<product_id>")
+@routes_main.route("/product/<product_id>")
 def product(product_id):
     with Session(engine) as session:
         stmt = select(Product).where(Product.id==product_id)
@@ -101,7 +102,7 @@ def product(product_id):
     return render_template("product.html", product = product)
 
 
-@app.route('/registration', methods=['GET','POST'])
+@routes_main.route('/registration', methods=['GET','POST'])
 def registration():
     if request.method== "GET":
         return render_template("registration.html")
@@ -128,7 +129,7 @@ def registration():
             session_login["user_id"] = user.id
         return jsonify({"message": "True"})
 
-@app.route("/login", methods=['GET','POST'])
+@routes_main.route("/login", methods=['GET','POST'])
 def login():
     if request.method== "GET":
         return render_template("login.html")
@@ -156,7 +157,7 @@ def login():
         return jsonify({"message": "True"})
     session_login.clear()
     return render_template("login.html")
-@app.route("/logout")
+@routes_main.route("/logout")
 def logout():
     user_id = session_login.get("user_id")
     with Session(engine) as session:
@@ -165,10 +166,10 @@ def logout():
         session.commit()
     session_login.clear()
     return redirect("/login")
-@app.route("/forgot/password")
+@routes_main.route("/forgot/password")
 def forgotpass():
     return render_template("forgotpass.html")
-@app.route("/forgot/password/email") # /forgot/password/email?email=
+@routes_main.route("/forgot/password/email") # /forgot/password/email?email=
 def send_mail():
     email = request.args.get("email")
     with Session(engine) as session:
@@ -185,7 +186,7 @@ def send_mail():
             code=401,
             description="такого email не существует!"
         )
-@app.route("/forgot/password/check/code")
+@routes_main.route("/forgot/password/check/code")
 def check_code():
     email = request.args.get("email")
     code = request.args.get("code")
@@ -199,7 +200,7 @@ def check_code():
                 description="неверный код"
             )
     return jsonify({"message": "True"})
-@app.route("/forgot/password/set", methods=["POST"])
+@routes_main.route("/forgot/password/set", methods=["POST"])
 def new_password():
     data = request.json
     email = data.get("email")
@@ -212,7 +213,7 @@ def new_password():
         session.execute(update_stmt)
         session.commit()
     return jsonify({"message": "True"})
-@app.route("/search")
+@routes_main.route("/search")
 def search():
     q=request.args.get("q").lower().strip()
     page = request.args.get("page")
@@ -270,7 +271,7 @@ def search():
 
     return render_template("search.html",q=q,products=search_stmt,results_count=results_count,page=page,total_results=total_results,results_all=results_all, total_categories=total_categories,cur_category=category,price=price,price_order=price_order)
 
-@app.route("/api/categories/stats")
+@routes_main.route("/api/categories/stats")
 def categories_stats():
     """API endpoint для получения статистики по категориям товаров"""
     with Session(engine) as session:
@@ -278,7 +279,7 @@ def categories_stats():
         result = session.execute(stmt).all()
         stats = {category: count for category, count in result}
     return jsonify(stats)
-@app.route("/api/users")
+@routes_main.route("/api/users")
 def users():
     user_id = session_login.get("user_id")
     with Session(engine) as session:
@@ -307,7 +308,7 @@ def users():
 
         stats.append(d)
     return jsonify(stats)
-@app.route("/api/userchatread", methods=["POST"])
+@routes_main.route("/api/userchatread", methods=["POST"])
 def userchatread():
     data=request.json
     user_id = data.get("user_id")
@@ -317,7 +318,7 @@ def userchatread():
         session.execute(massage_status)
         session.commit()
     return jsonify({"status":True})
-@app.route("/api/chat/<user_id>", methods=["GET"])
+@routes_main.route("/api/chat/<user_id>", methods=["GET"])
 def chats(user_id):
     admin_id = session_login.get("user_id")
     user_id = int(user_id)
@@ -339,7 +340,7 @@ def chats(user_id):
 
         stats.append(d)
     return jsonify(stats)
-@app.route("/api/admin/chat", methods=["GET"])
+@routes_main.route("/api/admin/chat", methods=["GET"])
 def chatsForAdmin():
     user_id = session_login.get("user_id")
 
@@ -363,7 +364,7 @@ def chatsForAdmin():
 
         stats.append(d)
     return jsonify(stats)
-@app.route("/api/massages", methods=["POST"])
+@routes_main.route("/api/massages", methods=["POST"])
 def massages():
     data = request.json
     user_id = session_login.get("user_id")
@@ -376,7 +377,7 @@ def massages():
         session.commit()
         socketio.emit("massage_touser", {"user_id": user_id, "text": text, "time_send":str(time_send)}, to=str(to_user))
     return jsonify({"id": user_id})
-@app.route("/api/admin/massages", methods=["POST"])
+@routes_main.route("/api/admin/massages", methods=["POST"])
 def massagesForAdmin():
     user_id = session_login.get("user_id")
     data = request.json
@@ -392,7 +393,7 @@ def massagesForAdmin():
             session.commit()
             socketio.emit("massage_toadmin", {"user_id": user_id, "text": text,"time_send": str(time_send)}, to="admins")
     return jsonify({"id": user_id})
-@app.route("/api/add/product", methods= ["POST"])
+@routes_main.route("/api/add/product", methods= ["POST"])
 def add_product():
     name=request.form.get("Name")
     price=request.form.get("price")
@@ -422,7 +423,7 @@ def add_product():
         countusersS=len(countusersa)
         return render_template("admin.html", name=user.name, email=user.email,countusers=countusersS )
 
-@app.route("/order/done", methods=["GET"])
+@routes_main.route("/order/done", methods=["GET"])
 def orderDone():
     order_id = request.args.get("order_id")
     user_id = session_login.get("user_id")

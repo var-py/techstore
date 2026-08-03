@@ -1,28 +1,26 @@
 from celery import Celery
 
-from app.main import app
+
 from app.utils.sendmail import send_order
 
+celery_app = Celery(__name__)
 
 def make_celery(app):
-    celery = Celery(
+    celery_app.conf.update(
         app.import_name,
         broker=app.config["CELERY_BROKER_URL"],
         backend=app.config["CELERY_RESULT_BACKEND"]
     )
 
-    celery.conf.update(app.config)
+    celery_app.conf.update(app.config)
 
-    class ContextTask(celery.Task):
+    class ContextTask(celery_app.Task):
         def __call__(self, *args, **kwargs):
             with app.app_context():
                 return self.run(*args, **kwargs)
 
-    celery.Task = ContextTask
-    return celery
+    celery_app.Task = ContextTask
 
-
-celery_app = make_celery(app)
 
 
 @celery_app.task(name="test_task")
