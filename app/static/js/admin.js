@@ -7,9 +7,12 @@ let messages = []
 
 document.addEventListener('DOMContentLoaded', function() {
     socket.on('user_status', ({ user_id, status }) => {
-        if (currentChatUser!=null && currentChatUser.id==user_id){
-        document.getElementById('currentUserStatus').textContent =
-            status ? 'В сети' : 'Не в сети';}
+        loadChatUsers();
+        if (currentChatUser && Number(currentChatUser.id) === Number(user_id)) {
+            currentChatUser.status = status;
+            document.getElementById('currentUserStatus').textContent =
+                status ? 'В сети' : 'Не в сети';
+        }
     });
         socket.on("massage_toadmin", (data) => {
       console.log("Пришло сообщение:", data);

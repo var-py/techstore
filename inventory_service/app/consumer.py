@@ -1,7 +1,7 @@
 import json
 from confluent_kafka import Consumer
 
-from inventory_service.app.producer import send_available_inventory
+from .producer import send_available_inventory
 
 consumer = Consumer({
     "bootstrap.servers": "localhost:9092",
@@ -9,7 +9,7 @@ consumer = Consumer({
     "auto.offset.reset": "earliest"
 })
 
-consumer.subscribe(["orders"])
+consumer.subscribe(["inventory"])
 
 def run_consumer():
     while True:

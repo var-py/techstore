@@ -30,3 +30,7 @@ def run_consumer():
                 if event["available"]==True:
                     send_massage.apply_async(countdown=5, args=(user.email, event["order_id"], "приехал!"))
             print("Отправляем ответ пользователю:", event["available"])
+
+
+if __name__ == "__main__":
+    run_consumer()
