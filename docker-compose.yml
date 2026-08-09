@@ -10,6 +10,15 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       - db
+  inventory_service:
+    build: inventory_service
+    container_name: inventory_service
+    env_file:
+      - .env
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      - db
   kafka:
     image: apache/kafka:4.1.2
     container_name: tech-kafka

@@ -31,6 +31,8 @@ def send_code(TO):
     print("Письмо отправлено!")
     return code
 def send_order(email,name_product,status):
+
+    print(email,name_product,status)
     SMTP_HOST = "smtp.mail.ru"  # сервер
     SMTP_PORT = 587  # порт
     SMTP_LOGIN = "zxcv6752@mail.ru"  # логин

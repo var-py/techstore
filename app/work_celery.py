@@ -37,4 +37,5 @@ def test_task(text):
     return "OK"
 @celery_app.task(name="send_massage")
 def send_massage(email,name_product,status):
+    print('celeryy')
     send_order(email, name_product, status=status)
