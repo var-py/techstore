@@ -2,7 +2,7 @@ import datetime
 
 from app.socket import socketio
 from app.work_celery import test_task
-from flask import Flask, jsonify, render_template, request, abort, session as session_login, redirect, Blueprint
+from flask import jsonify, render_template, request, abort, session as session_login, redirect, Blueprint
 from sqlalchemy import select, insert, or_, and_, distinct
 from sqlalchemy.orm import Session
 from sqlalchemy import update
@@ -154,6 +154,7 @@ def login():
             qqq=update(Users).values(status=True).where(Users.email==email)
             status_user = session.execute(qqq)
             session.commit()
+            print(session_login)
         return jsonify({"message": "True"})
     session_login.clear()
     return render_template("login.html")
@@ -427,9 +428,9 @@ def add_product():
 def orderDone():
     order_id = request.args.get("order_id")
     user_id = session_login.get("user_id")
-    print("CONNECTED", user_id)
+    print("CONNECTED", user_id,session_login)
     if user_id is None:
-        return
+        return render_template("registration.html")
     with Session(engine) as session:
         stmt=select(Order_item).where(Order_item.order_id == order_id)
         table=session.scalar(stmt)
