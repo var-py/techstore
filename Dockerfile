@@ -11,4 +11,4 @@ COPY .env .
 
 EXPOSE 80
 
-CMD ["python3","-m","app.main"]
+CMD ["gunicorn", "--worker-class", "gthread", "--workers", "1", "--threads", "20", "--bind", "0.0.0.0:80", "app.main:app"]

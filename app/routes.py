@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import update
 from sqlalchemy import func
 
-from app.DB.models import Product, Users, Code, Admin, CountProduct, Massages, Order_item
+from app.DB.models import Product, Users, Code, Admin, CountProduct, Massages
 from app.DB.session import engine, config
 from app.kafka.producer import send_ask_inventory
 from app.utils.security import hash_password, verify_password
@@ -426,19 +426,28 @@ def add_product():
 
 @routes_main.route("/order/done", methods=["GET"])
 def orderDone():
-    order_id = request.args.get("order_id")
+    product_id = request.args.get("product_id", type=int)
     user_id = session_login.get("user_id")
-    print("CONNECTED", user_id,session_login)
     if user_id is None:
-        return render_template("registration.html")
+        return redirect("/login")
+    if product_id is None:
+        abort(400, description="не указан идентификатор товара")
+
     with Session(engine) as session:
-        stmt=select(Order_item).where(Order_item.order_id == order_id)
-        table=session.scalar(stmt)
-        product_id=table.product_id
-    event={"product_id":product_id,"order_id":order_id, "user_id":user_id}
-    send_ask_inventory(event)
-    with Session(engine) as session:
-        stmt = select(Users).where(Users.id == event["user_id"])
-        user = session.scalar(stmt)
+        product = session.get(Product, product_id)
+        user = session.get(Users, user_id)
+        if product is None:
+            abort(404, description="товар не найден")
+        if user is None:
+            session_login.clear()
+            return redirect("/login")
+
         email = user.email
+
+    event = {
+        "product_id": product_id,
+        "order_id": product_id,
+        "user_id": user_id,
+    }
+    send_ask_inventory(event)
     return render_template("orderDone.html", email=email)
