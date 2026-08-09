@@ -1,4 +1,6 @@
 
+from pathlib import Path
+
 from flask import Flask
 
 from app.DB.session import engine, config
@@ -23,17 +25,21 @@ keyser= "/etc/letsencrypt/live/varpy.ru/privkey.pem"
 
 
 if __name__ == "__main__":
-    if __name__ == '__main__':
-        try:
-            socketio.run(
-                app,
-                host='0.0.0.0',
-                port=443,
-                debug=False,
-                allow_unsafe_werkzeug=True,
-                ssl_context=(
-                    certif, keyser
-                )
-            )
-        except:
-            socketio.run(app, host="0.0.0.0", port=80, debug=True, allow_unsafe_werkzeug=True)
+    if Path(certif).exists() and Path(keyser).exists():
+        socketio.run(
+            app,
+            host="0.0.0.0",
+            port=443,
+            debug=False,
+            allow_unsafe_werkzeug=True,
+            ssl_context=(certif, keyser),
+        )
+    else:
+        socketio.run(
+            app,
+            host="0.0.0.0",
+            port=80,
+            debug=False,
+            use_reloader=False,
+            allow_unsafe_werkzeug=True,
+        )
