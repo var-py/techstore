@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, text
 
-from inventory_service.app.models import Base
+from .models import Base
 from dotenv import dotenv_values
 config=dotenv_values(".env")
 engine = create_engine(config["AVAILABLE_URL"], isolation_level="AUTOCOMMIT")

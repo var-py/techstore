@@ -1,13 +1,14 @@
 import json
+import os
 from confluent_kafka import Consumer
 from sqlalchemy.orm import Session
-from inventory_service.app.database import engine
+from .database import engine
 from .models import Product
 from .producer import send_available_inventory
 from sqlalchemy import select
 
 consumer = Consumer({
-    "bootstrap.servers": "localhost:9092",
+    "bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
     "group.id": "email-service",
     "auto.offset.reset": "earliest"
 })

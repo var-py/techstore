@@ -1,4 +1,5 @@
 import json
+import os
 from confluent_kafka import Consumer
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -7,7 +8,7 @@ from app.DB.models import Users
 from app.DB.session import engine
 
 consumer = Consumer({
-    "bootstrap.servers": "localhost:9092",
+    "bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
     "group.id": "inventory-service",
     "auto.offset.reset": "earliest"
 })

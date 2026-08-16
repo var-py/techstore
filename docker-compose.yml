@@ -11,7 +11,9 @@ services:
     depends_on:
       - db
   inventory_service:
-    build: inventory_service
+    build:
+      context: .
+      dockerfile: inventory_service/Dockerfile
     container_name: inventory_service
     env_file:
       - .env
@@ -19,6 +21,19 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       - db
+      - kafka
+  notification_consumer:
+    build: .
+    container_name: notification_consumer
+    command: python3 -m app.kafka.consumer
+    env_file:
+      - .env
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      - db
+      - kafka
+      - redis
   kafka:
     image: apache/kafka:4.1.2
     container_name: tech-kafka

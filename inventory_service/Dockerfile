@@ -2,12 +2,12 @@ FROM python:3.14-rc-slim
 
 WORKDIR /techstore
 
-COPY requirements.txt .
+COPY inventory_service/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app ./app
-COPY ../.env .
+COPY inventory_service/app ./app
+COPY .env .
 
 EXPOSE 80
 
