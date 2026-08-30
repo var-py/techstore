@@ -1,5 +1,6 @@
 import datetime
 import os
+from pathlib import Path
 from uuid import uuid4
 
 import psycopg2
@@ -8,23 +9,24 @@ from psycopg2.extensions import parse_dsn
 
 from app.utils.security import hash_password
 from dotenv import load_dotenv
-load_dotenv(".env")
-import subprocess
-import pytest
+from alembic import command
+from alembic.config import Config
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+load_dotenv(PROJECT_ROOT / ".env")
 
 @pytest.fixture(scope="session", autouse=True)
-def apply_migrations():
-    subprocess.run(
-        ["flask", "db", "upgrade"],
-        check=True
-    )
+def apply_migrations(database_url):
+    config = Config(str(PROJECT_ROOT / "alembic.ini"))
+    config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
+    command.upgrade(config, "head")
 @pytest.fixture
 def base_url():
     url = os.getenv("TEST_BASE_URL")
     if not url:
         pytest.fail("Задайте TEST_BASE_URL или запустите make test", pytrace=False)
     return url.rstrip("/")
-@pytest.fixture
+@pytest.fixture(scope="session")
 def database_url():
     url = os.getenv("TEST_DATABASE_URL")
     if not url or parse_dsn(url).get("dbname") != "flask_db_test":
