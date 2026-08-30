@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 return response.json(); // ⏳ ждём парсинг
               })
-              .then(massagesInChat => {
+              .then(messagesInChat => {
                 // Очищаем контейнер
                 chatMessages.innerHTML = '';
                 // Добавляем сообщения
-                massagesInChat.forEach(message => {
+                messagesInChat.forEach(message => {
                     addMessage(message.text, message.sender);
                 });
                 chatWindow.style.display = 'flex';
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Bot response after a short delay
             //setTimeout(botResponse, 1000);
-             const url = `/api/admin/massages`;
+             const url = `/api/admin/messages`;
             const response = fetch(url, {
                 method: 'POST',
                 headers: {

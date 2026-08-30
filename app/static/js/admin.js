@@ -826,7 +826,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Сбрасываем счетчик непрочитанных
 
     }
-    function ReadMassages(user_id){
+    function ReadMessages(user_id){
         const url = `/api/userchatread`;
             const response = fetch(url, {
                 method: 'POST',
@@ -845,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Загрузка сообщений
     function loadChatMessages(userId) {
         const messagesContainer = document.getElementById('chatMessages');
-        let massagesInChat = [];
+        let messagesInChat = [];
         let lastMessage;
         fetch(`/api/chat/${userId}`, {
           method: 'GET',
@@ -858,20 +858,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return response.json(); // ⏳ ждём парсинг
           })
-          .then(massagesInChat => {
+          .then(messagesInChat => {
             // Очищаем контейнер
             messagesContainer.innerHTML = '';
             // Добавляем сообщения
 
-            massagesInChat.forEach(message => {
+            messagesInChat.forEach(message => {
                 const messageElement = createMessageElement(message);
                 messagesContainer.appendChild(messageElement);
                 lastMessage= message.text
             });
-          ReadMassages(userId)
+          ReadMessages(userId)
             // Прокручиваем вниз
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-          readUserMassages(userId)
+          readUserMessages(userId)
           lastUserMassage(userId,lastMessage)
           })
           .catch(error => {
@@ -968,7 +968,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Прокручиваем вниз
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            const url = `/api/massages`;
+            const url = `/api/messages`;
             const response = fetch(url, {
                 method: 'POST',
                 headers: {
@@ -1007,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.getElementById('unreadCount').textContent = totalUnread;
     }
-    function readUserMassages(userId) {
+    function readUserMessages(userId) {
         const users = document.querySelectorAll('.user-item.has-unread');
         users.forEach(user => {
             const unreadElement = user.getAttribute('data-user-id');

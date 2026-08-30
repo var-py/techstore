@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import update
 from sqlalchemy import func
 
-from app.DB.models import Product, Users, Code, Admin, CountProduct, Massages
+from app.DB.models import Product, Users, Code, Admin, CountProduct, Messages
 from app.DB.session import engine, config
 from app.kafka.producer import send_ask_inventory
 from app.utils.security import hash_password, verify_password
@@ -79,17 +79,17 @@ def account():
     if proverka_proverkaIP is not None:
         query = (
             select(func.count(distinct(Users.id)))
-            .join(Massages, Users.id == Massages.from_user)
+            .join(Messages, Users.id == Messages.from_user)
             .where(Users.status == True, Users.id != user_id)
         )
         countusersa = session.scalars(query).all()
         countusersS = len(countusersa)
         with Session(engine) as session:
-            all_massages = select(Massages).where(and_(Massages.to_user == user_id,Massages.is_read == False))
-        all_massages = session.execute(all_massages).scalars().all()
+            all_messages = select(Messages).where(and_(Messages.to_user == user_id,Messages.is_read == False))
+        all_messages = session.execute(all_messages).scalars().all()
         stats = []
 
-        return render_template("admin.html",name=user.name,email=user.email,countusers=countusersS,all_massages=len(all_massages))
+        return render_template("admin.html",name=user.name,email=user.email,countusers=countusersS,all_messages=len(all_messages))
     else:
         return render_template("account.html",name=user.name,email=user.email)
 
@@ -288,24 +288,24 @@ def users():
     all_users = session.execute(all_users).scalars().all()
     stats = []
     for user in all_users:
-        all_massages = select(Massages).where(
+        all_messages = select(Messages).where(
             or_(
-                and_(Massages.to_user == user_id, Massages.from_user == user.id, Massages.from_user != user_id),
-                and_(Massages.from_user == user_id, Massages.to_user == user.id, Massages.to_user != user_id)
+                and_(Messages.to_user == user_id, Messages.from_user == user.id, Messages.from_user != user_id),
+                and_(Messages.from_user == user_id, Messages.to_user == user.id, Messages.to_user != user_id)
             )
-        ).order_by(Massages.time_send)
+        ).order_by(Messages.time_send)
 
-        massages_send=session.execute(all_massages).scalars().all()
-        if not massages_send:
+        messages_send=session.execute(all_messages).scalars().all()
+        if not messages_send:
             continue
         text = None
-        if len(massages_send)>0:
-            text=massages_send[-1].text
-        unread_masseges=select(Massages).where(Massages.to_user==user_id, Massages.from_user==user.id,Massages.is_read!=True)
+        if len(messages_send)>0:
+            text=messages_send[-1].text
+        unread_masseges=select(Messages).where(Messages.to_user==user_id, Messages.from_user==user.id,Messages.is_read!=True)
         unread_masseges = session.execute(unread_masseges).scalars().all()
         unread=len(unread_masseges)
 
-        d = {"id": user.id, "name": user.name, "email": user.email,"status": user.status, "lastMessage": text , "unread": unread, "lastSeen":massages_send[-1].time_send}
+        d = {"id": user.id, "name": user.name, "email": user.email,"status": user.status, "lastMessage": text , "unread": unread, "lastSeen":messages_send[-1].time_send}
 
         stats.append(d)
     return jsonify(stats)
@@ -315,7 +315,7 @@ def userchatread():
     user_id = data.get("user_id")
     admin_id = session_login.get("user_id")
     with Session(engine) as session:
-        massage_status=update(Massages).values(is_read=True).where(Massages.from_user==user_id, Massages.to_user==admin_id)
+        massage_status=update(Messages).values(is_read=True).where(Messages.from_user==user_id, Messages.to_user==admin_id)
         session.execute(massage_status)
         session.commit()
     return jsonify({"status":True})
@@ -324,15 +324,15 @@ def chats(user_id):
     admin_id = session_login.get("user_id")
     user_id = int(user_id)
     with Session(engine) as session:
-        all_massages=select(Massages).where(
+        all_messages=select(Messages).where(
             or_(
-                and_(Massages.to_user==admin_id, Massages.from_user==user_id, Massages.from_user!=admin_id),
-                and_(Massages.from_user==admin_id, Massages.to_user==user_id, Massages.to_user!=admin_id)
+                and_(Messages.to_user==admin_id, Messages.from_user==user_id, Messages.from_user!=admin_id),
+                and_(Messages.from_user==admin_id, Messages.to_user==user_id, Messages.to_user!=admin_id)
             )
-        ).order_by(Massages.time_send)
-    all_massages = session.execute(all_massages).scalars().all()
+        ).order_by(Messages.time_send)
+    all_messages = session.execute(all_messages).scalars().all()
     stats = []
-    for massage in all_massages:
+    for massage in all_messages:
         if massage.from_user==user_id:
             sender="user"
         elif massage.from_user==admin_id:
@@ -348,15 +348,15 @@ def chatsForAdmin():
     with Session(engine) as session:
         admin_query = select(Admin.user_id)
         admin_ids = session.execute(admin_query).scalars().all()
-        all_massages=select(Massages).where(
+        all_messages=select(Messages).where(
             or_(
-                and_(Massages.to_user.in_(admin_ids), Massages.from_user==user_id, Massages.from_user.notin_(admin_ids)),
-                and_(Massages.from_user.in_(admin_ids), Massages.to_user==user_id, Massages.to_user.notin_(admin_ids))
+                and_(Messages.to_user.in_(admin_ids), Messages.from_user==user_id, Messages.from_user.notin_(admin_ids)),
+                and_(Messages.from_user.in_(admin_ids), Messages.to_user==user_id, Messages.to_user.notin_(admin_ids))
             )
-        ).order_by(Massages.time_send)
-        all_massages = session.execute(all_massages).scalars().all()
+        ).order_by(Messages.time_send)
+        all_messages = session.execute(all_messages).scalars().all()
     stats = []
-    for massage in all_massages:
+    for massage in all_messages:
         if massage.from_user==user_id:
             sender="user"
         elif massage.from_user in admin_ids:
@@ -365,21 +365,21 @@ def chatsForAdmin():
 
         stats.append(d)
     return jsonify(stats)
-@routes_main.route("/api/massages", methods=["POST"])
-def massages():
+@routes_main.route("/api/messages", methods=["POST"])
+def messages():
     data = request.json
     user_id = session_login.get("user_id")
     text=data.get("text")
     time_send = datetime.datetime.utcnow()
     to_user = data.get("to_user")
     with Session(engine) as session:
-        stmt = insert(Massages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=to_user)
+        stmt = insert(Messages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=to_user)
         session.execute(stmt)
         session.commit()
         socketio.emit("massage_touser", {"user_id": user_id, "text": text, "time_send":str(time_send)}, to=str(to_user))
     return jsonify({"id": user_id})
-@routes_main.route("/api/admin/massages", methods=["POST"])
-def massagesForAdmin():
+@routes_main.route("/api/admin/messages", methods=["POST"])
+def messagesForAdmin():
     user_id = session_login.get("user_id")
     data = request.json
     text=data.get("text")
@@ -389,7 +389,7 @@ def massagesForAdmin():
         name = select(Admin)
         admins= session.scalars(name)
         for i in admins:
-            stmt = insert(Massages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=i.user_id)
+            stmt = insert(Messages).values(from_user=user_id, text=text, time_send=str(time_send),to_user=i.user_id)
             session.execute(stmt)
             session.commit()
             socketio.emit("massage_toadmin", {"user_id": user_id, "text": text,"time_send": str(time_send)}, to="admins")

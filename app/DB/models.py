@@ -85,8 +85,8 @@ class CountProduct(Base):
     product_id: Mapped[int] = mapped_column(ForeignKey("product.id"))
     def __repr__(self) -> str:
         return f"code(id={self.id}, code={self.count}, email={self.sale}, product_id={self.product_id})"
-class Massages(Base):
-    __tablename__ = "massages"
+class Messages(Base):
+    __tablename__ = "messages"
     id: Mapped[int] = mapped_column(primary_key=True)
     text: Mapped[str] = mapped_column(nullable=False)
     time_send: Mapped[str] = mapped_column(nullable=False)
