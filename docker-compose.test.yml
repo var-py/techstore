@@ -17,12 +17,16 @@ services:
     env_file:
       - tests/.env.tests
     environment:
-      POSTGRES_DB: ${DB_HOST}
+      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     tmpfs:
       - /var/lib/postgresql/data
-
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U flask_user -d flask_db_test"]
+        interval: 2s
+        timeout: 3s
+        retries: 30
   web-test:
     <<: *test-image
     env_file: tests/.env.tests
