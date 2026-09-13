@@ -13,7 +13,7 @@ def test_user_can_log_in():
     pswd=f"{uuid4()}"
     try:
         registration = Request(
-            f"http://localhost/registration",
+            f"{os.getenv('TEST_BASE_URL')}/registration",
             data=json.dumps(
                 {"name": "Test User",
                  "email": email,
@@ -25,7 +25,7 @@ def test_user_can_log_in():
         with urlopen(registration, timeout=10) as response:
             assert response.status == 200
         try:
-            login = Request(f"http://localhost/login",
+            login = Request(f"{os.getenv('TEST_BASE_URL')}/login",
                             data=json.dumps(
                                 {"name": "Test User",
                                  "email": email,

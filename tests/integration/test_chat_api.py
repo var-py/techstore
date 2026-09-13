@@ -1,5 +1,6 @@
 
 import json
+import os
 from uuid import uuid4
 from urllib.request import HTTPCookieProcessor, Request, build_opener, urlopen
 import pytest
@@ -15,7 +16,7 @@ def test_user_can_send_message(base_url, db_connection, chat_users):
     try:
 
         login_req = Request(
-            f"{base_url}/login",
+            f"{os.getenv('TEST_BASE_URL')}/login",
             data=json.dumps({"email": chat_users["sender_email"], "password": chat_users["password"]}).encode(),
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -25,7 +26,7 @@ def test_user_can_send_message(base_url, db_connection, chat_users):
             assert response.status == 200
             assert {"message": "True"} == body
         msg_req = Request(
-            f"{base_url}/api/messages",
+            f"{os.getenv('TEST_BASE_URL')}/api/messages",
             data=json.dumps({"text": "Здравствуйте!", "to_user": chat_users["receiver_id"]}).encode(),
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -57,7 +58,7 @@ def test_sent_message_appears_in_chat(base_url, db_connection, chat_users):
 
     try:
         login_req = Request(
-            f"{base_url}/login",
+            f"{os.getenv('TEST_BASE_URL')}/login",
             data=json.dumps({"email": chat_users["sender_email"], "password": chat_users["password"]}).encode(),
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -66,7 +67,7 @@ def test_sent_message_appears_in_chat(base_url, db_connection, chat_users):
             assert response.status == 200
 
         msg_req = Request(
-            f"{base_url}/api/messages",
+            f"{os.getenv('TEST_BASE_URL')}/api/messages",
             data=json.dumps({"text": "Тестовое сообщение", "to_user": chat_users["receiver_id"]}).encode(),
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -75,7 +76,7 @@ def test_sent_message_appears_in_chat(base_url, db_connection, chat_users):
             assert response.status == 200
 
         chat_req = Request(
-            f"{base_url}/api/chat/{chat_users['receiver_id']}",
+            f"{os.getenv('TEST_BASE_URL')}/api/chat/{chat_users['receiver_id']}",
             headers={"Content-Type": "application/json"},
             method="GET",
         )

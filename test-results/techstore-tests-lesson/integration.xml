@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="5" time="0.868" timestamp="2026-09-13T10:23:03.463260+00:00" hostname="51a0ef26d56a"><testcase classname="tests.integration.test_chat_api" name="test_user_can_send_message" time="0.146" /><testcase classname="tests.integration.test_chat_api" name="test_sent_message_appears_in_chat" time="0.116" /><testcase classname="tests.integration.test_get" name="test_user_can_log_in" time="0.016"><failure message="urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;">self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb5967bf0&gt;, http_conn_args = {}
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="5" time="0.931" timestamp="2026-09-13T10:26:46.328646+00:00" hostname="b6037389f12a"><testcase classname="tests.integration.test_chat_api" name="test_user_can_send_message" time="0.142" /><testcase classname="tests.integration.test_chat_api" name="test_sent_message_appears_in_chat" time="0.115" /><testcase classname="tests.integration.test_get" name="test_user_can_log_in" time="0.016"><failure message="urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;">self = &lt;urllib.request.HTTPHandler object at 0x75123ded4a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x75123df67bf0&gt;, http_conn_args = {}
 
     def do_open(self, http_class, req, **http_conn_args):
         """Return an HTTPResponse object for the request, using http_class.
@@ -134,7 +134,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb5967bf0&gt;, http_conn_args = {}
+self = &lt;urllib.request.HTTPHandler object at 0x75123ded4a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x75123df67bf0&gt;, http_conn_args = {}
 
     def do_open(self, http_class, req, **http_conn_args):
         """Return an HTTPResponse object for the request, using http_class.
@@ -183,7 +183,7 @@ self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class =
 &gt;               raise URLError(err)
 E               urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;
 
-/usr/local/lib/python3.14/urllib/request.py:1324: URLError</failure></testcase><testcase classname="tests.integration.test_http_api" name="test_user_can_log_in" time="0.008"><failure message="urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;">self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb5929150&gt;, http_conn_args = {}
+/usr/local/lib/python3.14/urllib/request.py:1324: URLError</failure></testcase><testcase classname="tests.integration.test_http_api" name="test_user_can_log_in" time="0.008"><failure message="urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;">self = &lt;urllib.request.HTTPHandler object at 0x75123ded4a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x75123df2d150&gt;, http_conn_args = {}
 
     def do_open(self, http_class, req, **http_conn_args):
         """Return an HTTPResponse object for the request, using http_class.
@@ -319,7 +319,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb5929150&gt;, http_conn_args = {}
+self = &lt;urllib.request.HTTPHandler object at 0x75123ded4a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x75123df2d150&gt;, http_conn_args = {}
 
     def do_open(self, http_class, req, **http_conn_args):
         """Return an HTTPResponse object for the request, using http_class.
@@ -368,7 +368,7 @@ self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class =
 &gt;               raise URLError(err)
 E               urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;
 
-/usr/local/lib/python3.14/urllib/request.py:1324: URLError</failure></testcase><testcase classname="tests.integration.test_unautho" name="test_user_can_log_in" time="0.008"><failure message="urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;">self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb59299d0&gt;, http_conn_args = {}
+/usr/local/lib/python3.14/urllib/request.py:1324: URLError</failure></testcase><testcase classname="tests.integration.test_unautho" name="test_user_can_log_in" time="0.072"><failure message="urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;">self = &lt;urllib.request.HTTPHandler object at 0x75123ded4a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x75123df6ee50&gt;, http_conn_args = {}
 
     def do_open(self, http_class, req, **http_conn_args):
         """Return an HTTPResponse object for the request, using http_class.
@@ -474,7 +474,7 @@ During handling of the above exception, another exception occurred:
         pswd=f"{uuid4()}"
         try:
             registration = Request(
-                f"http://localhost/registration",
+                f"{os.getenv('TEST_BASE_URL')}/registration",
                 data=json.dumps(
                     {"name": "Test User",
                      "email": email,
@@ -483,10 +483,21 @@ During handling of the above exception, another exception occurred:
                 headers={"Content-Type": "application/json"},
                 method="POST",
             )
-&gt;           with urlopen(registration, timeout=10) as response:
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            with urlopen(registration, timeout=10) as response:
+                assert response.status == 200
+            try:
+                login = Request(f"http://localhost/login",
+                                data=json.dumps(
+                                    {"name": "Test User",
+                                     "email": email,
+                                     "password": "fsafkjhf"}
+                                ).encode(),
+                                headers={"Content-Type": "application/json"},
+                                method="POST", )
+&gt;               with urlopen(login, timeout=10) as response:
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/integration/test_unautho.py:25: 
+tests/integration/test_unautho.py:36: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 /usr/local/lib/python3.14/urllib/request.py:187: in urlopen
     return opener.open(url, data, timeout)
@@ -504,7 +515,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb59299d0&gt;, http_conn_args = {}
+self = &lt;urllib.request.HTTPHandler object at 0x75123ded4a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x75123df6ee50&gt;, http_conn_args = {}
 
     def do_open(self, http_class, req, **http_conn_args):
         """Return an HTTPResponse object for the request, using http_class.

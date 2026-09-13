@@ -42,7 +42,7 @@ def test_user_can_log_in():
         finally:
             pass
         try:
-            account= Request(f"http://localhost/account",
+            account= Request(f"{os.getenv('TEST_BASE_URL')}/account",
                              method="GET",)
             with client.open(account, timeout=10) as response:
                 page = response.read().decode()
