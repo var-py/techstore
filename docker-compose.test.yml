@@ -14,35 +14,31 @@ services:
 
   db-test:
     image: postgres:16
+    env_file:
+      - tests/.env.tests
     environment:
-      POSTGRES_DB: flask_db_test
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: ${DB_HOST}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     tmpfs:
       - /var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U test_user -d flask_db_test"]
-      interval: 2s
-      timeout: 3s
-      retries: 30
 
   web-test:
     <<: *test-image
     env_file: tests/.env.tests
     depends_on:
-      db-test:
-        condition: service_healthy
+      - db-test
     command:
       - sh
       - -c
       - >-
-        python tests/prepare_db.py &&
-        exec gunicorn --worker-class gthread --workers 1 --threads 20
-        --bind 0.0.0.0:80 app.main:app
+          PYTHONPATH=/techstore python tests/prepare_db.py &&
+              exec gunicorn --worker-class gthread --workers 1 --threads 20
+              --bind 0.0.0.0:80 app.main:app
 
   integration-tests:
     <<: *test-image
-    env_file: tests/docker.env
+    env_file: tests/.env.tests
     depends_on:
       web-test:
         condition: service_healthy

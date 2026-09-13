@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="6" failures="0" skipped="0" tests="6" time="0.192" timestamp="2026-09-13T09:29:47.188135+00:00" hostname="82276ea8599e"><testcase classname="tests.integration.test_chat_api" name="test_user_can_send_message" time="0.001"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def apply_migrations(database_url):
+        config = Config(str(PROJECT_ROOT / "alembic.ini"))
+        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
+&gt;       command.upgrade(config, "head")
+
+tests/integration/conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
+config = &lt;alembic.config.Config object at 0x722022185a90&gt;
+
+    @classmethod
+    def from_config(cls, config: Config) -&gt; ScriptDirectory:
+        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
+        instance.
+    
+        The :class:`.Config` need only have the ``script_location`` key
+        present.
+    
+        """
+        script_location = config.get_alembic_option("script_location")
+        if script_location is None:
+&gt;           raise util.CommandError(
+                "No 'script_location' key found in configuration."
+            )
+E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
+
+/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_chat_api" name="test_sent_message_appears_in_chat" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def apply_migrations(database_url):
+        config = Config(str(PROJECT_ROOT / "alembic.ini"))
+        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
+&gt;       command.upgrade(config, "head")
+
+tests/integration/conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
+config = &lt;alembic.config.Config object at 0x722022185a90&gt;
+
+    @classmethod
+    def from_config(cls, config: Config) -&gt; ScriptDirectory:
+        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
+        instance.
+    
+        The :class:`.Config` need only have the ``script_location`` key
+        present.
+    
+        """
+        script_location = config.get_alembic_option("script_location")
+        if script_location is None:
+&gt;           raise util.CommandError(
+                "No 'script_location' key found in configuration."
+            )
+E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
+
+/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_get" name="test_user_can_log_in" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def apply_migrations(database_url):
+        config = Config(str(PROJECT_ROOT / "alembic.ini"))
+        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
+&gt;       command.upgrade(config, "head")
+
+tests/integration/conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
+config = &lt;alembic.config.Config object at 0x722022185a90&gt;
+
+    @classmethod
+    def from_config(cls, config: Config) -&gt; ScriptDirectory:
+        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
+        instance.
+    
+        The :class:`.Config` need only have the ``script_location`` key
+        present.
+    
+        """
+        script_location = config.get_alembic_option("script_location")
+        if script_location is None:
+&gt;           raise util.CommandError(
+                "No 'script_location' key found in configuration."
+            )
+E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
+
+/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_http_api" name="test_user_can_log_in" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def apply_migrations(database_url):
+        config = Config(str(PROJECT_ROOT / "alembic.ini"))
+        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
+&gt;       command.upgrade(config, "head")
+
+tests/integration/conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
+config = &lt;alembic.config.Config object at 0x722022185a90&gt;
+
+    @classmethod
+    def from_config(cls, config: Config) -&gt; ScriptDirectory:
+        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
+        instance.
+    
+        The :class:`.Config` need only have the ``script_location`` key
+        present.
+    
+        """
+        script_location = config.get_alembic_option("script_location")
+        if script_location is None:
+&gt;           raise util.CommandError(
+                "No 'script_location' key found in configuration."
+            )
+E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
+
+/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_migrations" name="test_migrations_are_applied_before_tests" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def apply_migrations(database_url):
+        config = Config(str(PROJECT_ROOT / "alembic.ini"))
+        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
+&gt;       command.upgrade(config, "head")
+
+tests/integration/conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
+config = &lt;alembic.config.Config object at 0x722022185a90&gt;
+
+    @classmethod
+    def from_config(cls, config: Config) -&gt; ScriptDirectory:
+        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
+        instance.
+    
+        The :class:`.Config` need only have the ``script_location`` key
+        present.
+    
+        """
+        script_location = config.get_alembic_option("script_location")
+        if script_location is None:
+&gt;           raise util.CommandError(
+                "No 'script_location' key found in configuration."
+            )
+E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
+
+/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_unautho" name="test_user_can_log_in" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def apply_migrations(database_url):
+        config = Config(str(PROJECT_ROOT / "alembic.ini"))
+        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
+&gt;       command.upgrade(config, "head")
+
+tests/integration/conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
+config = &lt;alembic.config.Config object at 0x722022185a90&gt;
+
+    @classmethod
+    def from_config(cls, config: Config) -&gt; ScriptDirectory:
+        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
+        instance.
+    
+        The :class:`.Config` need only have the ``script_location`` key
+        present.
+    
+        """
+        script_location = config.get_alembic_option("script_location")
+        if script_location is None:
+&gt;           raise util.CommandError(
+                "No 'script_location' key found in configuration."
+            )
+E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
+
+/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase></testsuite></testsuites>
