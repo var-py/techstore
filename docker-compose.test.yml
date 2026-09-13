@@ -17,9 +17,9 @@ services:
     env_file:
       - tests/.env.tests
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: flask_db_test
+      POSTGRES_USER: flask_user
+      POSTGRES_PASSWORD: flask_password
     tmpfs:
       - /var/lib/postgresql/data
     healthcheck:
@@ -31,14 +31,13 @@ services:
     <<: *test-image
     env_file: tests/.env.tests
     depends_on:
-      - db-test
+      db-test:
+        condition: service_healthy
     command:
       - sh
       - -c
       - >-
-          PYTHONPATH=/techstore python tests/prepare_db.py &&
-              exec gunicorn --worker-class gthread --workers 1 --threads 20
-              --bind 0.0.0.0:80 app.main:app
+          PYTHONPATH=/techstore python tests/prepare_db.py && exec gunicorn --worker-class gthread --workers 1 --threads 20 --bind 0.0.0.0:80 app.main:app
 
   integration-tests:
     <<: *test-image

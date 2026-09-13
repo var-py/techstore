@@ -10,5 +10,7 @@ COPY inventory_service ./inventory_service
 COPY tests ./tests
 COPY pytest.ini ./
 COPY tests/.env.tests ./.env
+COPY alembic.ini ./
+COPY alembic ./alembic
 
 CMD ["python", "-m", "pytest", "-v"]

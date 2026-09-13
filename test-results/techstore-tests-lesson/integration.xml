@@ -1,205 +1,556 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="6" failures="0" skipped="0" tests="6" time="0.192" timestamp="2026-09-13T09:29:47.188135+00:00" hostname="82276ea8599e"><testcase classname="tests.integration.test_chat_api" name="test_user_can_send_message" time="0.001"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="5" time="0.868" timestamp="2026-09-13T10:23:03.463260+00:00" hostname="51a0ef26d56a"><testcase classname="tests.integration.test_chat_api" name="test_user_can_send_message" time="0.146" /><testcase classname="tests.integration.test_chat_api" name="test_sent_message_appears_in_chat" time="0.116" /><testcase classname="tests.integration.test_get" name="test_user_can_log_in" time="0.016"><failure message="urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;">self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb5967bf0&gt;, http_conn_args = {}
 
-    @pytest.fixture(scope="session", autouse=True)
-    def apply_migrations(database_url):
-        config = Config(str(PROJECT_ROOT / "alembic.ini"))
-        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
-&gt;       command.upgrade(config, "head")
-
-tests/integration/conftest.py:22: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
-    script = ScriptDirectory.from_config(config)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
-config = &lt;alembic.config.Config object at 0x722022185a90&gt;
-
-    @classmethod
-    def from_config(cls, config: Config) -&gt; ScriptDirectory:
-        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
-        instance.
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
     
-        The :class:`.Config` need only have the ``script_location`` key
-        present.
-    
+        http_class must implement the HTTPConnection API from http.client.
         """
-        script_location = config.get_alembic_option("script_location")
-        if script_location is None:
-&gt;           raise util.CommandError(
-                "No 'script_location' key found in configuration."
-            )
-E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
-
-/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_chat_api" name="test_sent_message_appears_in_chat" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
-
-    @pytest.fixture(scope="session", autouse=True)
-    def apply_migrations(database_url):
-        config = Config(str(PROJECT_ROOT / "alembic.ini"))
-        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
-&gt;       command.upgrade(config, "head")
-
-tests/integration/conftest.py:22: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
-    script = ScriptDirectory.from_config(config)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
-config = &lt;alembic.config.Config object at 0x722022185a90&gt;
-
-    @classmethod
-    def from_config(cls, config: Config) -&gt; ScriptDirectory:
-        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
-        instance.
+        host = req.host
+        if not host:
+            raise URLError('no host given')
     
-        The :class:`.Config` need only have the ``script_location`` key
-        present.
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
     
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+&gt;               h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+
+/usr/local/lib/python3.14/urllib/request.py:1321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+/usr/local/lib/python3.14/http/client.py:1338: in request
+    self._send_request(method, url, body, headers, encode_chunked)
+/usr/local/lib/python3.14/http/client.py:1384: in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.14/http/client.py:1333: in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.14/http/client.py:1093: in _send_output
+    self.send(msg)
+/usr/local/lib/python3.14/http/client.py:1037: in send
+    self.connect()
+/usr/local/lib/python3.14/http/client.py:1003: in connect
+    self.sock = self._create_connection(
+/usr/local/lib/python3.14/socket.py:870: in create_connection
+    raise exceptions[0]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+address = ('localhost', 80), timeout = 10, source_address = None, all_errors = False
+
+    def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
+                          source_address=None, *, all_errors=False):
+        """Connect to *address* and return the socket object.
+    
+        Convenience function.  Connect to *address* (a 2-tuple ``(host,
+        port)``) and return the socket object.  Passing the optional
+        *timeout* parameter will set the timeout on the socket instance
+        before attempting to connect.  If no *timeout* is supplied, the
+        global default timeout setting returned by :func:`getdefaulttimeout`
+        is used.  If *source_address* is set it must be a tuple of (host, port)
+        for the socket to bind as a source address before making the connection.
+        A host of '' or port 0 tells the OS to use the default. When a connection
+        cannot be created, raises the last error if *all_errors* is False,
+        and an ExceptionGroup of all errors if *all_errors* is True.
         """
-        script_location = config.get_alembic_option("script_location")
-        if script_location is None:
-&gt;           raise util.CommandError(
-                "No 'script_location' key found in configuration."
+    
+        host, port = address
+        exceptions = []
+        for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+            af, socktype, proto, canonname, sa = res
+            sock = None
+            try:
+                sock = socket(af, socktype, proto)
+                if timeout is not _GLOBAL_DEFAULT_TIMEOUT:
+                    sock.settimeout(timeout)
+                if source_address:
+                    sock.bind(source_address)
+&gt;               sock.connect(sa)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+/usr/local/lib/python3.14/socket.py:855: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.mark.integration
+    def test_user_can_log_in():
+        email=f"{uuid4()}@mail.ru"
+        pswd=f"{uuid4()}"
+        try:
+            registration = Request(
+                f"http://localhost/registration",
+                data=json.dumps(
+                    {"name": "Test User",
+                     "email": email,
+                     "password": pswd}
+                ).encode(),
+                headers={"Content-Type": "application/json"},
+                method="POST",
             )
-E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
+&gt;           with urlopen(registration, timeout=10) as response:
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_get" name="test_user_can_log_in" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
+tests/integration/test_get.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+/usr/local/lib/python3.14/urllib/request.py:187: in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.14/urllib/request.py:487: in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.14/urllib/request.py:504: in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+/usr/local/lib/python3.14/urllib/request.py:464: in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+/usr/local/lib/python3.14/urllib/request.py:1350: in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-    @pytest.fixture(scope="session", autouse=True)
-    def apply_migrations(database_url):
-        config = Config(str(PROJECT_ROOT / "alembic.ini"))
-        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
-&gt;       command.upgrade(config, "head")
+self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb5967bf0&gt;, http_conn_args = {}
 
-tests/integration/conftest.py:22: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
-    script = ScriptDirectory.from_config(config)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
-config = &lt;alembic.config.Config object at 0x722022185a90&gt;
-
-    @classmethod
-    def from_config(cls, config: Config) -&gt; ScriptDirectory:
-        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
-        instance.
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
     
-        The :class:`.Config` need only have the ``script_location`` key
-        present.
-    
+        http_class must implement the HTTPConnection API from http.client.
         """
-        script_location = config.get_alembic_option("script_location")
-        if script_location is None:
-&gt;           raise util.CommandError(
-                "No 'script_location' key found in configuration."
-            )
-E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
-
-/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_http_api" name="test_user_can_log_in" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
-
-    @pytest.fixture(scope="session", autouse=True)
-    def apply_migrations(database_url):
-        config = Config(str(PROJECT_ROOT / "alembic.ini"))
-        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
-&gt;       command.upgrade(config, "head")
-
-tests/integration/conftest.py:22: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
-    script = ScriptDirectory.from_config(config)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
-config = &lt;alembic.config.Config object at 0x722022185a90&gt;
-
-    @classmethod
-    def from_config(cls, config: Config) -&gt; ScriptDirectory:
-        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
-        instance.
+        host = req.host
+        if not host:
+            raise URLError('no host given')
     
-        The :class:`.Config` need only have the ``script_location`` key
-        present.
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
     
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+                h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+            except OSError as err: # timeout error
+&gt;               raise URLError(err)
+E               urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;
+
+/usr/local/lib/python3.14/urllib/request.py:1324: URLError</failure></testcase><testcase classname="tests.integration.test_http_api" name="test_user_can_log_in" time="0.008"><failure message="urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;">self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb5929150&gt;, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
         """
-        script_location = config.get_alembic_option("script_location")
-        if script_location is None:
-&gt;           raise util.CommandError(
-                "No 'script_location' key found in configuration."
-            )
-E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
-
-/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_migrations" name="test_migrations_are_applied_before_tests" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
-
-    @pytest.fixture(scope="session", autouse=True)
-    def apply_migrations(database_url):
-        config = Config(str(PROJECT_ROOT / "alembic.ini"))
-        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
-&gt;       command.upgrade(config, "head")
-
-tests/integration/conftest.py:22: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
-    script = ScriptDirectory.from_config(config)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
-config = &lt;alembic.config.Config object at 0x722022185a90&gt;
-
-    @classmethod
-    def from_config(cls, config: Config) -&gt; ScriptDirectory:
-        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
-        instance.
+        host = req.host
+        if not host:
+            raise URLError('no host given')
     
-        The :class:`.Config` need only have the ``script_location`` key
-        present.
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
     
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+&gt;               h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+
+/usr/local/lib/python3.14/urllib/request.py:1321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+/usr/local/lib/python3.14/http/client.py:1338: in request
+    self._send_request(method, url, body, headers, encode_chunked)
+/usr/local/lib/python3.14/http/client.py:1384: in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.14/http/client.py:1333: in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.14/http/client.py:1093: in _send_output
+    self.send(msg)
+/usr/local/lib/python3.14/http/client.py:1037: in send
+    self.connect()
+/usr/local/lib/python3.14/http/client.py:1003: in connect
+    self.sock = self._create_connection(
+/usr/local/lib/python3.14/socket.py:870: in create_connection
+    raise exceptions[0]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+address = ('localhost', 80), timeout = 10, source_address = None, all_errors = False
+
+    def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
+                          source_address=None, *, all_errors=False):
+        """Connect to *address* and return the socket object.
+    
+        Convenience function.  Connect to *address* (a 2-tuple ``(host,
+        port)``) and return the socket object.  Passing the optional
+        *timeout* parameter will set the timeout on the socket instance
+        before attempting to connect.  If no *timeout* is supplied, the
+        global default timeout setting returned by :func:`getdefaulttimeout`
+        is used.  If *source_address* is set it must be a tuple of (host, port)
+        for the socket to bind as a source address before making the connection.
+        A host of '' or port 0 tells the OS to use the default. When a connection
+        cannot be created, raises the last error if *all_errors* is False,
+        and an ExceptionGroup of all errors if *all_errors* is True.
         """
-        script_location = config.get_alembic_option("script_location")
-        if script_location is None:
-&gt;           raise util.CommandError(
-                "No 'script_location' key found in configuration."
+    
+        host, port = address
+        exceptions = []
+        for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+            af, socktype, proto, canonname, sa = res
+            sock = None
+            try:
+                sock = socket(af, socktype, proto)
+                if timeout is not _GLOBAL_DEFAULT_TIMEOUT:
+                    sock.settimeout(timeout)
+                if source_address:
+                    sock.bind(source_address)
+&gt;               sock.connect(sa)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+/usr/local/lib/python3.14/socket.py:855: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.mark.integration
+    def test_user_can_log_in():
+        email=f"{uuid4()}@mail.ru"
+        pswd=f"{uuid4()}"
+        try:
+            registration = Request(
+                f"http://localhost/registration",
+                data=json.dumps(
+                    {"name": "Test User",
+                     "email": email,
+                     "password": pswd}
+                ).encode(),
+                headers={"Content-Type": "application/json"},
+                method="POST",
             )
-E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
+&gt;           with urlopen(registration, timeout=10) as response:
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase><testcase classname="tests.integration.test_unautho" name="test_user_can_log_in" time="0.000"><error message="failed on setup with &quot;alembic.util.exc.CommandError: No 'script_location' key found in configuration.&quot;">database_url = 'postgresql://flask_user:flask_password@localhost:5433/flask_db_test'
+tests/integration/test_http_api.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+/usr/local/lib/python3.14/urllib/request.py:187: in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.14/urllib/request.py:487: in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.14/urllib/request.py:504: in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+/usr/local/lib/python3.14/urllib/request.py:464: in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+/usr/local/lib/python3.14/urllib/request.py:1350: in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-    @pytest.fixture(scope="session", autouse=True)
-    def apply_migrations(database_url):
-        config = Config(str(PROJECT_ROOT / "alembic.ini"))
-        config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
-&gt;       command.upgrade(config, "head")
+self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb5929150&gt;, http_conn_args = {}
 
-tests/integration/conftest.py:22: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-/usr/local/lib/python3.14/site-packages/alembic/command.py:470: in upgrade
-    script = ScriptDirectory.from_config(config)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-cls = &lt;class 'alembic.script.base.ScriptDirectory'&gt;
-config = &lt;alembic.config.Config object at 0x722022185a90&gt;
-
-    @classmethod
-    def from_config(cls, config: Config) -&gt; ScriptDirectory:
-        """Produce a new :class:`.ScriptDirectory` given a :class:`.Config`
-        instance.
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
     
-        The :class:`.Config` need only have the ``script_location`` key
-        present.
-    
+        http_class must implement the HTTPConnection API from http.client.
         """
-        script_location = config.get_alembic_option("script_location")
-        if script_location is None:
-&gt;           raise util.CommandError(
-                "No 'script_location' key found in configuration."
-            )
-E           alembic.util.exc.CommandError: No 'script_location' key found in configuration.
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+                h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+            except OSError as err: # timeout error
+&gt;               raise URLError(err)
+E               urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;
 
-/usr/local/lib/python3.14/site-packages/alembic/script/base.py:171: CommandError</error></testcase></testsuite></testsuites>
+/usr/local/lib/python3.14/urllib/request.py:1324: URLError</failure></testcase><testcase classname="tests.integration.test_unautho" name="test_user_can_log_in" time="0.008"><failure message="urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;">self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb59299d0&gt;, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+&gt;               h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+
+/usr/local/lib/python3.14/urllib/request.py:1321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+/usr/local/lib/python3.14/http/client.py:1338: in request
+    self._send_request(method, url, body, headers, encode_chunked)
+/usr/local/lib/python3.14/http/client.py:1384: in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.14/http/client.py:1333: in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.14/http/client.py:1093: in _send_output
+    self.send(msg)
+/usr/local/lib/python3.14/http/client.py:1037: in send
+    self.connect()
+/usr/local/lib/python3.14/http/client.py:1003: in connect
+    self.sock = self._create_connection(
+/usr/local/lib/python3.14/socket.py:870: in create_connection
+    raise exceptions[0]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+address = ('localhost', 80), timeout = 10, source_address = None, all_errors = False
+
+    def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
+                          source_address=None, *, all_errors=False):
+        """Connect to *address* and return the socket object.
+    
+        Convenience function.  Connect to *address* (a 2-tuple ``(host,
+        port)``) and return the socket object.  Passing the optional
+        *timeout* parameter will set the timeout on the socket instance
+        before attempting to connect.  If no *timeout* is supplied, the
+        global default timeout setting returned by :func:`getdefaulttimeout`
+        is used.  If *source_address* is set it must be a tuple of (host, port)
+        for the socket to bind as a source address before making the connection.
+        A host of '' or port 0 tells the OS to use the default. When a connection
+        cannot be created, raises the last error if *all_errors* is False,
+        and an ExceptionGroup of all errors if *all_errors* is True.
+        """
+    
+        host, port = address
+        exceptions = []
+        for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+            af, socktype, proto, canonname, sa = res
+            sock = None
+            try:
+                sock = socket(af, socktype, proto)
+                if timeout is not _GLOBAL_DEFAULT_TIMEOUT:
+                    sock.settimeout(timeout)
+                if source_address:
+                    sock.bind(source_address)
+&gt;               sock.connect(sa)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+/usr/local/lib/python3.14/socket.py:855: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.mark.integration
+    def test_user_can_log_in():
+        email=f"{uuid4()}@mail.ru"
+        pswd=f"{uuid4()}"
+        try:
+            registration = Request(
+                f"http://localhost/registration",
+                data=json.dumps(
+                    {"name": "Test User",
+                     "email": email,
+                     "password": pswd}
+                ).encode(),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+&gt;           with urlopen(registration, timeout=10) as response:
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_unautho.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+/usr/local/lib/python3.14/urllib/request.py:187: in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.14/urllib/request.py:487: in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.14/urllib/request.py:504: in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+/usr/local/lib/python3.14/urllib/request.py:464: in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+/usr/local/lib/python3.14/urllib/request.py:1350: in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;urllib.request.HTTPHandler object at 0x710fb58d0a50&gt;, http_class = &lt;class 'http.client.HTTPConnection'&gt;, req = &lt;urllib.request.Request object at 0x710fb59299d0&gt;, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+                h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+            except OSError as err: # timeout error
+&gt;               raise URLError(err)
+E               urllib.error.URLError: &lt;urlopen error [Errno 111] Connection refused&gt;
+
+/usr/local/lib/python3.14/urllib/request.py:1324: URLError</failure></testcase></testsuite></testsuites>

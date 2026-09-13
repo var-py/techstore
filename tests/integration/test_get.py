@@ -1,4 +1,5 @@
 import json
+import os
 from http.cookiejar import CookieJar
 from uuid import uuid4
 from urllib.request import HTTPCookieProcessor, Request, build_opener, urlopen
@@ -50,7 +51,7 @@ def test_user_can_log_in():
         finally:
             pass
     finally:
-        DATABASE_URL = "postgresql://flask_user:flask_password@localhost:5433/postgres"
+        DATABASE_URL = os.getenv("TEST_DATABASE_URL")
         connection = psycopg2.connect(DATABASE_URL)
         connection.autocommit = True
         with connection.cursor() as cursor:

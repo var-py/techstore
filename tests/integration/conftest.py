@@ -15,11 +15,11 @@ from alembic.config import Config
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(PROJECT_ROOT / ".env")
 
-@pytest.fixture(scope="session", autouse=True)
-def apply_migrations(database_url):
-    config = Config(str(PROJECT_ROOT / "alembic.ini"))
-    config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
-    command.upgrade(config, "head")
+# @pytest.fixture(scope="session", autouse=True)
+# def apply_migrations(database_url):
+#     config = Config(str(PROJECT_ROOT / "alembic.ini"))
+#     config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
+#     command.upgrade(config, "head")
 @pytest.fixture
 def base_url():
     url = os.getenv("TEST_BASE_URL")
