@@ -84,11 +84,13 @@
                     <button class="add-to-cart">
                         <i class="fas fa-shopping-cart"></i> В корзину
                     </button>
-                    <button class="buy-now" onclick="window.location.href='/order/done?product_id={{ product.id }}'">Купить сейчас</button>
+                    <button class="buy-now" data-product-id="{{ product.id }}">
+                        <i class="fas fa-bolt"></i> Купить сейчас
+                    </button>
                 </div>
 
                 <div class="wishlist-compare">
-                    <button class="wishlist-btn">
+                    <button class="wishlist-btn" data-product-id="{{ product.id }}">
                         <i class="far fa-heart"></i> В избранное
                     </button>
                     <button class="compare-btn">

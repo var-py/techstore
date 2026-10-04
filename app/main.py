@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import Flask
 
 from app.DB.session import engine, config
+from app.account_api import account_api
 from app.routes import routes_main
 from app.socket import socketio
 from app.work_celery import make_celery
@@ -20,6 +21,7 @@ socketio.init_app(app)
 make_celery(app)
 
 app.register_blueprint(routes_main)
+app.register_blueprint(account_api)
 certif="/etc/letsencrypt/live/varpy.ru/fullchain.pem"
 keyser= "/etc/letsencrypt/live/varpy.ru/privkey.pem"
 

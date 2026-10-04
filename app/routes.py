@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import update
 from sqlalchemy import func
 
+from app.account_api import make_order
 from app.DB.models import Product, Users, Code, Admin, CountProduct, Messages
 from app.DB.session import engine, config
 from app.kafka.producer import send_ask_inventory
@@ -68,30 +69,32 @@ def account():
     user_id=session_login.get("user_id")
     if user_id is None:
         return redirect("/login")
-    else:
-        with Session(engine) as session:
-            name=select(Users).where(Users.id==user_id)
-            user=session.scalar(name)
     real_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    print(real_ip)
-    proverkaIP = select(Admin).where(Admin.IP == real_ip,Admin.user_id==user_id)
-    proverka_proverkaIP = session.scalar(proverkaIP)
-    if proverka_proverkaIP is not None:
-        query = (
-            select(func.count(distinct(Users.id)))
-            .join(Messages, Users.id == Messages.from_user)
-            .where(Users.status == True, Users.id != user_id)
-        )
-        countusersa = session.scalars(query).all()
-        countusersS = len(countusersa)
-        with Session(engine) as session:
+    with Session(engine) as session:
+        user = session.get(Users, user_id)
+        if user is None:
+            session_login.clear()
+            return redirect("/login")
+        proverkaIP = select(Admin).where(Admin.IP == real_ip,Admin.user_id==user_id)
+        proverka_proverkaIP = session.scalar(proverkaIP)
+        if proverka_proverkaIP is not None:
+            query = (
+                select(func.count(distinct(Users.id)))
+                .join(Messages, Users.id == Messages.from_user)
+                .where(Users.status == True, Users.id != user_id)
+            )
+            countusersa = session.scalars(query).all()
+            countusersS = len(countusersa)
             all_messages = select(Messages).where(and_(Messages.to_user == user_id,Messages.is_read == False))
-        all_messages = session.execute(all_messages).scalars().all()
-        stats = []
-
-        return render_template("admin.html",name=user.name,email=user.email,countusers=countusersS,all_messages=len(all_messages))
-    else:
-        return render_template("account.html",name=user.name,email=user.email)
+            all_messages = session.execute(all_messages).scalars().all()
+            return render_template("admin.html",name=user.name,email=user.email,countusers=countusersS,all_messages=len(all_messages))
+        return render_template(
+            "account.html",
+            name=user.name,
+            email=user.email,
+            user_id=user.id,
+            created_at=user.created_at,
+        )
 
 
 @routes_main.route("/product/<product_id>")
@@ -427,6 +430,8 @@ def add_product():
 @routes_main.route("/order/done", methods=["GET"])
 def orderDone():
     product_id = request.args.get("product_id", type=int)
+    qty = max(1, request.args.get("qty", default=1, type=int) or 1)
+    address_id = request.args.get("address_id", type=int)
     user_id = session_login.get("user_id")
     if user_id is None:
         return redirect("/login")
@@ -443,11 +448,14 @@ def orderDone():
             return redirect("/login")
 
         email = user.email
+        # Заказ сохраняем в БД, чтобы он появился в разделе «Мои заказы».
+        order = make_order(session, user_id, product_id, qty, address_id)
+        order_id = order.id
 
     event = {
         "product_id": product_id,
-        "order_id": product_id,
+        "order_id": order_id,
         "user_id": user_id,
     }
     send_ask_inventory(event)
-    return render_template("orderDone.html", email=email)
+    return render_template("orderDone.html", email=email, order_id=order_id, product=product, qty=qty)

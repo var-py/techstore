@@ -3,139 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет | Интернет-магазин</title>
+    <title>Личный кабинет | TechShop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <div class="logo">МАГАЗИН</div>
-            <div class="user-info">
-                <div class="user-avatar">ИИ</div>
-                <div>{{name}}</div>
-            </div>
-        </div>
-    </header>
-<div class="chat-bot">
-    <div class="chat-btn" id="chatBtn">
-        <i class="fas fa-comments"></i>
-    </div>
-    <div class="chat-window" id="chatWindow">
-        <div class="chat-header">
-            <h3>Чат с поддержкой</h3>
-            <span id="closeChat"><i class="fas fa-times"></i></span>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot-message">
-                Здравствуйте! Чем могу помочь?
-            </div>
-        </div>
-        <div class="chat-input">
-            <input type="text" id="userInput" placeholder="Введите ваше сообщение...">
-            <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
-        </div>
-    </div>
-</div>
+<header class="app-header">
+    <div class="container header-content">
+        <a class="logo" href="/store">
+            <i class="fas fa-laptop"></i>
+            <span>TechShop</span>
+        </a>
 
-    <div class="container">
+        <nav class="main-nav" aria-label="Основная навигация">
+            <a href="/store"><i class="fas fa-store"></i> Каталог</a>
+            <a href="/account" class="active" aria-current="page"><i class="fas fa-user"></i> Кабинет</a>
+            <a href="/#support"><i class="fas fa-headset"></i> Поддержка</a>
+        </nav>
+
+        <div class="user-info">
+            <div class="user-avatar" id="headerAvatar" aria-hidden="true">ИИ</div>
+            <div class="user-meta">
+                <span class="user-name" id="headerName">{{ name }}</span>
+                <span class="user-role">Покупатель</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container page">
+    <div class="account-layout">
         <aside class="sidebar">
-            <ul class="sidebar-menu">
-                <li><a href="#profile" class="active" data-section="profile">Личные данные</a></li>
-                <li><a href="#orders" data-section="orders">Мои заказы</a></li>
-                <li><a href="#addresses" data-section="addresses">Адреса доставки</a></li>
-                <li><a href="#favorites" data-section="favorites">Избранное</a></li>
-                <li><a href="#reviews" data-section="reviews">Мои отзывы</a></li>
-                <li><a href="#settings" data-section="settings">Настройки</a></li>
-                <li><a href="/logout">Выйти</a></li>
-            </ul>
+            <div class="profile-card">
+                <div class="profile-avatar" id="sidebarAvatar" aria-hidden="true">ИИ</div>
+                <div class="profile-name" id="sidebarName">{{ name }}</div>
+                <div class="profile-email" id="sidebarEmail">{{ email }}</div>
+                <div class="profile-since">С нами с <span id="sidebarSince">—</span></div>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Разделы кабинета">
+                <button type="button" class="nav-item active" data-section="profile">
+                    <i class="fas fa-id-card"></i>
+                    <span class="nav-label">Личные данные</span>
+                </button>
+                <button type="button" class="nav-item" data-section="orders">
+                    <i class="fas fa-box-open"></i>
+                    <span class="nav-label">Мои заказы</span>
+                    <span class="badge" id="badgeOrders" hidden>0</span>
+                </button>
+                <button type="button" class="nav-item" data-section="addresses">
+                    <i class="fas fa-map-location-dot"></i>
+                    <span class="nav-label">Адреса доставки</span>
+                    <span class="badge" id="badgeAddresses" hidden>0</span>
+                </button>
+                <button type="button" class="nav-item" data-section="favorites">
+                    <i class="fas fa-heart"></i>
+                    <span class="nav-label">Избранное</span>
+                    <span class="badge" id="badgeFavorites" hidden>0</span>
+                </button>
+                <button type="button" class="nav-item" data-section="reviews">
+                    <i class="fas fa-star"></i>
+                    <span class="nav-label">Мои отзывы</span>
+                    <span class="badge" id="badgeReviews" hidden>0</span>
+                </button>
+                <button type="button" class="nav-item" data-section="settings">
+                    <i class="fas fa-gear"></i>
+                    <span class="nav-label">Настройки</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button type="button" class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <span>Выйти</span>
+                </button>
+            </div>
         </aside>
 
-        <main class="main-content">
-            <!-- Секция личных данных -->
-            <section id="profile-section" class="content-section active">
-                <h2 class="section-title">Личные данные</h2>
-                <form>
-                    <div class="form-group">
-                        <label for="name">Имя</label>
-                        <input type="text" id="name" value="{{name}}">
+        <div class="content" id="content">
+            <!-- Личные данные -->
+            <section class="section active" id="section-profile" aria-labelledby="title-profile">
+                <header class="section-head">
+                    <div>
+                        <h2 class="section-title" id="title-profile">
+                            <i class="fas fa-id-card"></i> Личные данные
+                        </h2>
+                        <p class="section-sub">Имя и email используются для входа и для писем о заказах.</p>
                     </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" value="{{email}}">
+                </header>
+
+                <div class="stat-grid">
+                    <button type="button" class="stat-card" data-goto="orders">
+                        <i class="fas fa-box-open"></i>
+                        <span class="stat-value" data-stat="orders">0</span>
+                        <span class="stat-label">Заказов</span>
+                    </button>
+                    <button type="button" class="stat-card" data-goto="favorites">
+                        <i class="fas fa-heart"></i>
+                        <span class="stat-value" data-stat="favorites">0</span>
+                        <span class="stat-label">В избранном</span>
+                    </button>
+                    <button type="button" class="stat-card" data-goto="reviews">
+                        <i class="fas fa-star"></i>
+                        <span class="stat-value" data-stat="reviews">0</span>
+                        <span class="stat-label">Отзывов</span>
+                    </button>
+                    <button type="button" class="stat-card" data-goto="addresses">
+                        <i class="fas fa-map-location-dot"></i>
+                        <span class="stat-value" data-stat="addresses">0</span>
+                        <span class="stat-label">Адресов</span>
+                    </button>
+                </div>
+
+                <form class="card form" id="profileForm" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profileName">Имя</label>
+                            <input id="profileName" name="name" type="text" value="{{ name }}"
+                                   autocomplete="name" maxlength="120" required>
+                            <span class="field-hint">Так к вам будут обращаться в письмах и чате.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email</label>
+                            <input id="profileEmail" name="email" type="email" value="{{ email }}"
+                                   autocomplete="email" maxlength="190" required>
+                            <span class="field-hint">На этот адрес приходят уведомления о заказах.</span>
+                        </div>
                     </div>
-                    <button type="button" class="btn">Сохранить изменения</button>
+
+                    <div class="readonly-grid">
+                        <div class="readonly-item">
+                            <span class="readonly-label">ID аккаунта</span>
+                            <span class="readonly-value">#{{ user_id }}</span>
+                        </div>
+                        <div class="readonly-item">
+                            <span class="readonly-label">Дата регистрации</span>
+                            <span class="readonly-value" id="profileCreatedAt">—</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-floppy-disk"></i> Сохранить изменения
+                        </button>
+                        <button type="button" class="btn btn-ghost" id="profileReset">
+                            <i class="fas fa-rotate-left"></i> Отменить
+                        </button>
+                    </div>
                 </form>
             </section>
 
-            <!-- Секция заказов -->
-            <section id="orders-section" class="content-section">
-                <h2 class="section-title">История заказов</h2>
+            <!-- Мои заказы -->
+            <section class="section" id="section-orders" aria-labelledby="title-orders">
+                <header class="section-head">
+                    <div>
+                        <h2 class="section-title" id="title-orders">
+                            <i class="fas fa-box-open"></i> Мои заказы
+                        </h2>
+                        <p class="section-sub">История покупок и текущие статусы заказов.</p>
+                    </div>
+                    <button type="button" class="btn btn-ghost" id="ordersRefresh">
+                        <i class="fas fa-arrows-rotate"></i> Обновить
+                    </button>
+                </header>
+                <div class="stack" id="ordersList" aria-live="polite"></div>
+            </section>
 
-                <div class="order-card">
-                    <div class="order-header">
-                        <div>Заказ №12345 от 12.05.2023</div>
-                        <div class="order-status status-delivered">Доставлен</div>
+            <!-- Адреса доставки -->
+            <section class="section" id="section-addresses" aria-labelledby="title-addresses">
+                <header class="section-head">
+                    <div>
+                        <h2 class="section-title" id="title-addresses">
+                            <i class="fas fa-map-location-dot"></i> Адреса доставки
+                        </h2>
+                        <p class="section-sub">Адрес по умолчанию подставляется при оформлении заказа.</p>
                     </div>
-                    <div class="order-details">
-                        <div>3 товара на сумму 15 490 руб.</div>
-                        <div>Курьерская доставка</div>
+                    <button type="button" class="btn btn-primary" id="addressAddBtn">
+                        <i class="fas fa-plus"></i> Добавить адрес
+                    </button>
+                </header>
+                <div class="stack" id="addressesList" aria-live="polite"></div>
+
+                <form class="card form hidden" id="addressForm" novalidate>
+                    <h3 class="card-title" id="addressFormTitle">Новый адрес</h3>
+                    <input type="hidden" id="addressId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="addressRecipient">Получатель</label>
+                            <input id="addressRecipient" type="text" maxlength="120" required placeholder="Иван Иванов">
+                        </div>
+                        <div class="form-group">
+                            <label for="addressPhone">Телефон</label>
+                            <input id="addressPhone" type="tel" maxlength="40" required placeholder="+7 900 000-00-00">
+                        </div>
                     </div>
+                    <div class="form-row form-row-3">
+                        <div class="form-group">
+                            <label for="addressCity">Город</label>
+                            <input id="addressCity" type="text" maxlength="120" required placeholder="Москва">
+                        </div>
+                        <div class="form-group">
+                            <label for="addressStreet">Улица</label>
+                            <input id="addressStreet" type="text" maxlength="180" required placeholder="ул. Тверская">
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label for="addressHouse">Дом</label>
+                            <input id="addressHouse" type="text" maxlength="40" required placeholder="15">
+                        </div>
+                    </div>
+                    <div class="form-row form-row-3">
+                        <div class="form-group form-group-sm">
+                            <label for="addressApartment">Квартира</label>
+                            <input id="addressApartment" type="text" maxlength="40" placeholder="42">
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label for="addressPostcode">Индекс</label>
+                            <input id="addressPostcode" type="text" maxlength="20" placeholder="125009">
+                        </div>
+                        <div class="form-group">
+                            <label for="addressComment">Комментарий курьеру</label>
+                            <input id="addressComment" type="text" maxlength="255" placeholder="Код домофона 123">
+                        </div>
+                    </div>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="addressIsDefault">
+                        <span>Сделать адресом по умолчанию</span>
+                    </label>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-floppy-disk"></i> Сохранить адрес
+                        </button>
+                        <button type="button" class="btn btn-ghost" id="addressCancelBtn">Отмена</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Избранное -->
+            <section class="section" id="section-favorites" aria-labelledby="title-favorites">
+                <header class="section-head">
+                    <div>
+                        <h2 class="section-title" id="title-favorites">
+                            <i class="fas fa-heart"></i> Избранное
+                        </h2>
+                        <p class="section-sub">Товары, которые вы отложили, чтобы вернуться к ним позже.</p>
+                    </div>
+                </header>
+
+                <div class="card inline-form">
+                    <label for="favoriteProductSelect" class="inline-form-label">
+                        <i class="fas fa-plus"></i> Добавить товар
+                    </label>
+                    <select id="favoriteProductSelect">
+                        <option value="">Загрузка товаров…</option>
+                    </select>
+                    <button type="button" class="btn btn-primary" id="favoriteAddBtn">
+                        <i class="fas fa-heart"></i> В избранное
+                    </button>
                 </div>
 
-                <div class="order-card">
-                    <div class="order-header">
-                        <div>Заказ №12344 от 05.05.2023</div>
-                        <div class="order-status status-processing">В обработке</div>
+                <div class="product-grid" id="favoritesList" aria-live="polite"></div>
+            </section>
+
+            <!-- Мои отзывы -->
+            <section class="section" id="section-reviews" aria-labelledby="title-reviews">
+                <header class="section-head">
+                    <div>
+                        <h2 class="section-title" id="title-reviews">
+                            <i class="fas fa-star"></i> Мои отзывы
+                        </h2>
+                        <p class="section-sub">Ваши оценки и впечатления о купленных товарах.</p>
                     </div>
-                    <div class="order-details">
-                        <div>2 товара на сумму 8 750 руб.</div>
-                        <div>Самовывоз</div>
+                    <button type="button" class="btn btn-primary" id="reviewAddBtn">
+                        <i class="fas fa-pen"></i> Написать отзыв
+                    </button>
+                </header>
+
+                <form class="card form hidden" id="reviewForm" novalidate>
+                    <h3 class="card-title" id="reviewFormTitle">Новый отзыв</h3>
+                    <input type="hidden" id="reviewId">
+                    <div class="form-group">
+                        <label for="reviewProduct">Товар</label>
+                        <select id="reviewProduct" required>
+                            <option value="">Выберите товар</option>
+                        </select>
                     </div>
+                    <div class="form-group">
+                        <span class="label-text">Оценка</span>
+                        <div class="stars-input" id="reviewStars">
+                            <label><input type="radio" name="rating" value="1"><i class="fas fa-star"></i></label>
+                            <label><input type="radio" name="rating" value="2"><i class="fas fa-star"></i></label>
+                            <label><input type="radio" name="rating" value="3"><i class="fas fa-star"></i></label>
+                            <label><input type="radio" name="rating" value="4"><i class="fas fa-star"></i></label>
+                            <label><input type="radio" name="rating" value="5" checked><i class="fas fa-star"></i></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reviewText">Отзыв</label>
+                        <textarea id="reviewText" rows="4" maxlength="5000" required
+                                  placeholder="Что понравилось, а что можно улучшить?"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-floppy-disk"></i> Сохранить отзыв
+                        </button>
+                        <button type="button" class="btn btn-ghost" id="reviewCancelBtn">Отмена</button>
+                    </div>
+                </form>
+
+                <div class="stack" id="reviewsList" aria-live="polite"></div>
+            </section>
+
+            <!-- Настройки -->
+            <section class="section" id="section-settings" aria-labelledby="title-settings">
+                <header class="section-head">
+                    <div>
+                        <h2 class="section-title" id="title-settings">
+                            <i class="fas fa-gear"></i> Настройки аккаунта
+                        </h2>
+                        <p class="section-sub">Безопасность и уведомления.</p>
+                    </div>
+                </header>
+
+                <form class="card form" id="passwordForm" novalidate>
+                    <h3 class="card-title"><i class="fas fa-lock"></i> Смена пароля</h3>
+                    <div class="form-row form-row-3">
+                        <div class="form-group">
+                            <label for="currentPassword">Текущий пароль</label>
+                            <input id="currentPassword" type="password" autocomplete="current-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">Новый пароль</label>
+                            <input id="newPassword" type="password" autocomplete="new-password" minlength="6" required>
+                            <span class="field-hint">Минимум 6 символов.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Повторите пароль</label>
+                            <input id="confirmPassword" type="password" autocomplete="new-password" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-key"></i> Изменить пароль
+                        </button>
+                    </div>
+                </form>
+
+                <div class="card">
+                    <h3 class="card-title"><i class="fas fa-bell"></i> Уведомления</h3>
+                    <p class="card-sub">Настройки сохраняются автоматически.</p>
+                    <label class="switch-row">
+                        <span class="switch">
+                            <input type="checkbox" id="notifyOrders">
+                            <span class="switch-track"><span class="switch-thumb"></span></span>
+                        </span>
+                        <span class="switch-text">
+                            <strong>Статусы заказов</strong>
+                            <small>Письма о сборке, отправке и доставке</small>
+                        </span>
+                    </label>
+                    <label class="switch-row">
+                        <span class="switch">
+                            <input type="checkbox" id="notifyPromo">
+                            <span class="switch-track"><span class="switch-thumb"></span></span>
+                        </span>
+                        <span class="switch-text">
+                            <strong>Новости и акции</strong>
+                            <small>Скидки, распродажи и персональные предложения</small>
+                        </span>
+                    </label>
                 </div>
 
-                <div class="order-card">
-                    <div class="order-header">
-                        <div>Заказ №12340 от 20.04.2023</div>
-                        <div class="order-status status-cancelled">Отменен</div>
-                    </div>
-                    <div class="order-details">
-                        <div>1 товар на сумму 4 990 руб.</div>
-                        <div>Почтовая доставка</div>
-                    </div>
+                <div class="card danger-card">
+                    <h3 class="card-title"><i class="fas fa-right-from-bracket"></i> Завершение сеанса</h3>
+                    <p class="card-sub">Выйдите, если работаете с чужого компьютера.</p>
+                    <button type="button" class="btn btn-danger" id="logoutBtnSettings">Выйти из аккаунта</button>
                 </div>
             </section>
-
-            <!-- Секция адресов доставки -->
-            <section id="addresses-section" class="content-section">
-                <h2 class="section-title">Адреса доставки</h2>
-                <p>Здесь вы можете управлять своими адресами доставки.</p>
-                <!-- Контент для адресов доставки -->
-            </section>
-
-            <!-- Секция избранного -->
-            <section id="favorites-section" class="content-section">
-                <h2 class="section-title">Избранные товары</h2>
-                <p>Здесь будут отображаться товары, добавленные в избранное.</p>
-                <!-- Контент для избранного -->
-            </section>
-
-            <!-- Секция отзывов -->
-            <section id="reviews-section" class="content-section">
-                <h2 class="section-title">Мои отзывы</h2>
-                <p>Здесь будут отображаться ваши отзывы о товарах.</p>
-                <!-- Контент для отзывов -->
-            </section>
-
-            <!-- Секция настроек -->
-            <section id="settings-section" class="content-section">
-                <h2 class="section-title">Настройки аккаунта</h2>
-                <p>Здесь вы можете настроить параметры вашего аккаунта.</p>
-                <!-- Контент для настроек -->
-            </section>
-        </main>
+        </div>
     </div>
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-<script src="{{ url_for('static', filename='js/account.js') }}"></script>
+</main>
 
+<div class="chat-bot">
+    <button type="button" class="chat-btn" id="chatBtn" aria-label="Открыть чат с поддержкой">
+        <i class="fas fa-comments"></i>
+        <span class="chat-badge" id="chatBadge" hidden>0</span>
+    </button>
+    <div class="chat-window" id="chatWindow" hidden>
+        <div class="chat-header">
+            <div class="chat-header-text">
+                <h3>Чат с поддержкой</h3>
+                <small id="chatStatus">Обычно отвечаем в течение дня</small>
+            </div>
+            <button type="button" class="chat-close" id="closeChat" aria-label="Закрыть чат">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <form class="chat-input" id="chatForm">
+            <input type="text" id="userInput" placeholder="Введите ваше сообщение…" autocomplete="off">
+            <button type="submit" id="sendMessage" aria-label="Отправить">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/account.js') }}"></script>
 </body>
 </html>

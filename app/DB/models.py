@@ -3,10 +3,17 @@ from typing import List
 from typing import Optional
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
+from sqlalchemy import UniqueConstraint
+from sqlalchemy import true
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+
+
+def now_iso() -> str:
+    """Текущее время в ISO-формате (как в остальных таблицах проекта)."""
+    return datetime.datetime.now(datetime.UTC).isoformat()
 
 
 class Base(DeclarativeBase):
@@ -24,6 +31,8 @@ class Users(Base):
     #     back_populates="users", cascade="all, delete-orphan"
     # )
     created_at: Mapped[str] = mapped_column(nullable=False, default=datetime.datetime.now(datetime.UTC))
+    notify_orders: Mapped[bool] = mapped_column(nullable=False, default=True, server_default=true())
+    notify_promo: Mapped[bool] = mapped_column(nullable=False, default=True, server_default=true())
     def __repr__(self) -> str:
         return f"users(id={self.id}, name={self.name}, email={self.email}, password={self.password})"
 
@@ -42,6 +51,7 @@ class Order(Base):
     user_id: Mapped[int]= mapped_column(ForeignKey("users.id"))
     status: Mapped[str]= mapped_column(nullable=False)
     created_at: Mapped[str] = mapped_column(nullable=False)
+    address_id: Mapped[Optional[int]] = mapped_column(ForeignKey("address.id"), nullable=True)
     users: Mapped["Users"] = relationship(back_populates="orders")
     def __repr__(self) -> str:
         return f"order(created_at={self.created_at}, count={self.count},user_id={self.user_id})"
@@ -95,3 +105,46 @@ class Messages(Base):
     is_read: Mapped[bool] = mapped_column(nullable=False, default=False)
     def __repr__(self) -> str:
         return f"code(id={self.id},text={self.text})"
+
+class Address(Base):
+    """Адрес доставки пользователя (раздел «Адреса доставки»)."""
+    __tablename__ = "address"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    recipient: Mapped[str] = mapped_column(nullable=False)
+    phone: Mapped[str] = mapped_column(nullable=False)
+    city: Mapped[str] = mapped_column(nullable=False)
+    street: Mapped[str] = mapped_column(nullable=False)
+    house: Mapped[str] = mapped_column(nullable=False)
+    apartment: Mapped[Optional[str]] = mapped_column(nullable=True)
+    postcode: Mapped[Optional[str]] = mapped_column(nullable=True)
+    comment: Mapped[Optional[str]] = mapped_column(nullable=True)
+    is_default: Mapped[bool] = mapped_column(nullable=False, default=False, server_default=true())
+    created_at: Mapped[str] = mapped_column(nullable=False, default=now_iso)
+    def __repr__(self) -> str:
+        return f"address(id={self.id}, user_id={self.user_id}, city={self.city}, street={self.street})"
+
+class Favorite(Base):
+    """Избранный товар пользователя (раздел «Избранное»)."""
+    __tablename__ = "favorite"
+    __table_args__ = (UniqueConstraint("user_id", "product_id", name="uq_favorite_user_product"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("product.id"), nullable=False)
+    created_at: Mapped[str] = mapped_column(nullable=False, default=now_iso)
+    def __repr__(self) -> str:
+        return f"favorite(id={self.id}, user_id={self.user_id}, product_id={self.product_id})"
+
+class Review(Base):
+    """Отзыв пользователя о товаре (раздел «Мои отзывы»)."""
+    __tablename__ = "review"
+    __table_args__ = (UniqueConstraint("user_id", "product_id", name="uq_review_user_product"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("product.id"), nullable=False)
+    rating: Mapped[int] = mapped_column(nullable=False, default=5)
+    text: Mapped[str] = mapped_column(nullable=False)
+    created_at: Mapped[str] = mapped_column(nullable=False, default=now_iso)
+    updated_at: Mapped[Optional[str]] = mapped_column(nullable=True)
+    def __repr__(self) -> str:
+        return f"review(id={self.id}, user_id={self.user_id}, product_id={self.product_id}, rating={self.rating})"

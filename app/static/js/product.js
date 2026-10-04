@@ -69,4 +69,71 @@
                     this.style.background = '#4a76a8';
                 }, 2000);
             });
+
+            // Покупка: количество учитывается, заказ сохраняется на сервере
+            const buyNowBtn = document.querySelector('.buy-now');
+            if (buyNowBtn) {
+                buyNowBtn.addEventListener('click', function() {
+                    const quantity = parseInt(quantityInput.value, 10) || 1;
+                    window.location.href =
+                        `/order/done?product_id=${this.dataset.productId}&qty=${quantity}`;
+                });
+            }
+
+            // Избранное: кнопка синхронизирована с разделом «Избранное» кабинета
+            const wishlistBtn = document.querySelector('.wishlist-btn');
+            if (wishlistBtn) {
+                const productId = Number(wishlistBtn.dataset.productId);
+
+                const paintWishlist = (active) => {
+                    wishlistBtn.dataset.active = active ? '1' : '0';
+                    wishlistBtn.innerHTML = active
+                        ? '<i class="fas fa-heart"></i> В избранном'
+                        : '<i class="far fa-heart"></i> В избранное';
+                };
+
+                fetch('/api/account/favorites', {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin',
+                })
+                    .then((response) => (response.ok ? response.json() : []))
+                    .then((favorites) => {
+                        paintWishlist(favorites.some((item) => item.id === productId));
+                    })
+                    .catch(() => {});
+
+                wishlistBtn.addEventListener('click', function() {
+                    const active = this.dataset.active === '1';
+                    const request = fetch(
+                        active ? `/api/account/favorites/${productId}` : '/api/account/favorites',
+                        {
+                            method: active ? 'DELETE' : 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'same-origin',
+                            body: active ? undefined : JSON.stringify({ product_id: productId }),
+                        }
+                    );
+
+                    request
+                        .then((response) => {
+                            if (response.status === 401) {
+                                window.location.href = '/login';
+                                return null;
+                            }
+                            return response.json();
+                        })
+                        .then((data) => {
+                            if (!data) return;
+                            if (data.error) {
+                                alert(data.error);
+                                return;
+                            }
+                            paintWishlist(!active);
+                        })
+                        .catch(() => alert('Не удалось обновить избранное'));
+                });
+            }
         });

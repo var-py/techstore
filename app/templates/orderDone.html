@@ -456,17 +456,13 @@
         </div>
 
         <div class="actions">
-            <a class="button button-primary" href="/">
-                На главную
+            <a class="button button-primary" href="/account#orders">
+                Мои заказы
             </a>
 
-            <button
-                class="button button-secondary"
-                id="newOrderButton"
-                type="button"
-            >
-                Новый заказ
-            </button>
+            <a class="button button-secondary" href="/store">
+                В каталог
+            </a>
         </div>
     </main>
 
@@ -487,20 +483,18 @@
             const copyButton =
                 document.getElementById("copyButton");
 
-            const newOrderButton =
-                document.getElementById("newOrderButton");
-
             const notification =
                 document.getElementById("notification");
 
             /*
-             * Можно заменить генерацию номера заказа
-             * на значение, полученное от вашего сервера.
-             *
-             * Например:
-             * const orderNumber = "#IN-123456";
+             * Номер заказа приходит с сервера: заказ уже сохранён в базе,
+             * поэтому в личном кабинете он появится в разделе «Мои заказы».
              */
-            const orderNumber = generateOrderNumber();
+            const serverOrderId = {% if order_id is defined and order_id %}{{ order_id }}{% else %}null{% endif %};
+
+            const orderNumber = serverOrderId
+                ? `№${String(serverOrderId).padStart(6, "0")}`
+                : generateOrderNumber();
 
             orderNumberElement.textContent = orderNumber;
 
@@ -512,14 +506,6 @@
                     fallbackCopy(orderNumber);
                     showNotification("Номер заказа скопирован");
                 }
-            });
-
-            newOrderButton.addEventListener("click", () => {
-                /*
-                 * Укажите здесь адрес страницы
-                 * создания нового заказа.
-                 */
-                window.location.href = "/order";
             });
 
             function generateOrderNumber() {
