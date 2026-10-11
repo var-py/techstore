@@ -85,7 +85,7 @@ jobs:
 
           attempt=1
           while [ "$attempt" -le 30 ]; do
-              if curl --fail --silent http://127.0.0.1/ > /dev/null; then
+              if docker compose exec -T web python -c 'import urllib.request; urllib.request.urlopen("http://127.0.0.1/", timeout=5).read()' > /dev/null 2>&1; then
                   echo "Application is available"
                   exit 0
               fi
