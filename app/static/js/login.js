@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('successMessage').textContent = 'Ошибка входа';
                 document.getElementById('successMessage').style.backgroundColor = '#C41E3A';
                 document.getElementById('successMessage').style.color = '#ffffff';
-                throw new Error('Ошибка сети');
+                throw new Error(response.status === 401 ? 'Неверный email или пароль' : 'Не удалось войти. Попробуйте позже');
             }
             return response.json();
         })
@@ -136,6 +136,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('successMessage').style.color = '#ffffff';
                 throw new Error('Ошибка регистрации');
             }
+        })
+        .catch(error => {
+            const message = document.getElementById('successMessage');
+            message.style.display = 'block';
+            message.textContent = error instanceof TypeError ? 'Не удалось связаться с сервером' : error.message;
+            message.style.backgroundColor = '#C41E3A';
+            message.style.color = '#ffffff';
         })
         .finally(() => {
             // Восстанавливаем кнопку

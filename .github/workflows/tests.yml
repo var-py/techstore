@@ -80,12 +80,15 @@ jobs:
           git checkout --detach "$revision"
 
           docker compose config --quiet
-          docker compose up -d --build --remove-orphans
+          docker compose build
+          docker compose up -d --wait --wait-timeout 120 db redis
+          docker compose run --rm --no-deps web python -m app.migrate
+          docker compose up -d --no-build --remove-orphans
           docker compose ps
 
           attempt=1
           while [ "$attempt" -le 30 ]; do
-              if docker compose exec -T web python -c 'import urllib.request; urllib.request.urlopen("http://127.0.0.1/", timeout=5).read()' > /dev/null 2>&1; then
+              if docker compose exec -T web python -m app.deploy_smoke > /dev/null 2>&1; then
                   echo "Application is available"
                   exit 0
               fi
