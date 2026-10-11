@@ -82,7 +82,7 @@ jobs:
           docker compose config --quiet
           docker compose build
           docker compose up -d --wait --wait-timeout 120 db redis
-          docker compose run --rm --no-deps web python -m app.migrate
+          docker compose run -T --interactive=false --rm --no-deps web python -m app.migrate
           docker compose up -d --no-build --remove-orphans
           docker compose ps
 
