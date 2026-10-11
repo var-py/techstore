@@ -64,12 +64,20 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 \
             -p "$SERVER_PORT" \
             "$SERVER_USER@$SERVER_HOST" \
-            'bash -se' <<'REMOTE'
+            "bash -se -- '${{ github.sha }}'" <<'REMOTE'
           set -eu
 
           cd /home/techstore
+          revision="$1"
           git fetch origin master
-          git pull --ff-only origin master
+          git cat-file -e "$revision^{commit}"
+          if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+              echo "Tracked server files were modified; preserve changes before deploying" >&2
+              git diff --stat >&2
+              exit 1
+          fi
+          git branch "deploy-backup-$(date -u +%Y%m%dT%H%M%S)-$$" HEAD
+          git checkout --detach "$revision"
 
           docker compose config --quiet
           docker compose up -d --build --remove-orphans

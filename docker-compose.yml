@@ -3,7 +3,7 @@ services:
     build: .
     container_name: flask_app
     ports:
-      - "80:80"
+      - "${WEB_PORT:-80}:80"
     env_file:
       - .env
     environment:

@@ -23,7 +23,7 @@ def send_code(TO):
     body = f"ваш временный код: {code}"
     msg.attach(MIMEText(body, "plain", "utf-8"))
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
         server.starttls()
         server.login(SMTP_LOGIN, SMTP_PASSWORD)
         server.send_message(msg)
@@ -49,7 +49,7 @@ def send_order(email,name_product,status):
     body = f"ваш заказ {name_product} {status}"
     msg.attach(MIMEText(body, "plain", "utf-8"))
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
         server.starttls()
         server.login(SMTP_LOGIN, SMTP_PASSWORD)
         server.send_message(msg)
